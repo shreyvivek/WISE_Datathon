@@ -59,3 +59,22 @@ Intervals ignore matching uncertainty. These are observed disparities, not evide
 ## Proxy check (5-fold CV logistic regression predicting Black vs White applicant)
 AUC: financial features only 0.680; county only 0.740; both 0.792 (0.5 = no signal). Financial characteristics and location both carry information about race,
 so "blind" matching does not remove all correlation with race; this is a limitation of any public-HMDA matching, and a reason the gap is an observed (not causal) quantity.
+
+## Model Sensitivity Analysis (exploratory; `python -m src.models.model_sensitivity logreg|xgb`)
+Predict the HISTORICAL decision (denied vs approved) for White/Black/Asian applicants (n=30,254; 6.9% denied) with 5-fold out-of-fold predictions.
+Model A = financial features + lender + county, no demographics. Model B = A + race, ethnicity, sex, age. XGBoost ran inside the LinuxONE container (s390x, 32 s for both models x 5 folds, shared CPU).
+| model | AUC A | AUC B | White actual / predA / predB | Black actual / predA / predB | Asian actual / predA / predB |
+|---|---|---|---|---|---|
+| logistic regression | 0.806 | 0.816 | 4.7% / 5.5% / 4.7% | 13.1% / 11.1% / 13.2% | 8.6% / 7.6% / 8.5% |
+| XGBoost | 0.867 | 0.873 | 4.7% / 5.3% / 4.7% | 13.1% / 11.5% / 13.1% | 8.6% / 7.7% / 8.4% |
+Reading: without demographics the models under-predict denials for Black applicants and over-predict for White applicants; adding demographics removes that gap (by construction, since group
+base rates are then learnable). Overall AUC barely changes (+0.006 to +0.010). This means the group differences in outcomes are not fully explained by the public financial/lender/county
+fields. It does NOT show that a lender used race: credit scores, assets and other underwriting inputs are absent and may correlate with race; and omitting race does not remove proxies (see proxy check).
+Historical decisions are not an approval standard; Model B is for auditing only. Calibration bins for Model A are in the JSON outputs. Precision/recall are reported at the threshold giving the base-rate share of predicted denials.
+
+## Granite reviewer notes (IBM Granite 4.0-H 350M *base*, f16 GGUF, llama.cpp in the provided LinuxONE container)
+- Flow: structured facts JSON -> 2-shot raw-completion prompt -> Granite -> **validator** (rejects invented numbers, accusatory wording, bad length) -> deterministic template fallback; the missing-information sentence and the fixed disclaimer are always appended by code, never by the model.
+- 3 of 3 live API tests validated on the first pass (more in the cache: see `notes_precompute.log` on the VM). `tests/test_core.py::test_granite_output_is_validated` covers rejection cases.
+- Latency (shared 3-vCPU VM): ~13 s for a 44-token note measured in isolation; 17-45 s through the API while other work ran. Not real-time, so notes for the top-25 queue cases are pre-generated and cached; live matching (~4 ms) is the real-time path.
+- zDNN/NNPA: the llama.cpp log shows the zDNN backend initialised on the NNPA device (501 MiB of weights placed on it). Measured effect: with offload on (n_gpu_layers=-1) a 2-shot note took ~18 s vs ~13 s with offload off, and ~13 s vs ~14 s with a 1-shot prompt. **No speed-up was observed for this model, so the server runs with offload off and we make no acceleration claim.** Single shared VM, 2 repetitions each; treat as indicative.
+- A 350M base model is weak at instruction following; it works here only because the prompt is tightly constrained and every output is validated.

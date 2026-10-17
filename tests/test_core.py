@@ -30,3 +30,13 @@ def test_note_never_accuses_and_handles_insufficient():
     n = make_note({"quality": "weak"}); assert "Insufficient comparable evidence" in n
     n = make_note({"quality": "strong", "n_strong": 3, "n_candidates": 10, "dist": 0.4, "same_lender": True, "missing": ["income"]})
     assert "does not establish" in n and "discriminat" not in n.lower()
+
+
+def test_granite_output_is_validated():
+    from src.explainability.reviewer_notes import facts_for, finalize
+    rec = {"quality": "strong", "n_strong": 3, "n_candidates": 277, "dist": 0.31, "same_lender": True, "missing": ["dti"], "denial_reasons": ["credit history"]}
+    good = "This denied application was queued because 3 approved applications from the same lender, out of 277 candidates, report closely similar income and loan amount."
+    r = finalize(good, rec); assert r["generator"].startswith("granite") and "Not reported" in r["note"] and "does not establish" in r["note"]
+    assert finalize(good.replace("277", "999"), rec)["generator"] == "deterministic-template"               # invented number
+    assert finalize("The lender discriminated against this applicant in 3 cases out of 277.", rec)["generator"] == "deterministic-template"
+    assert finalize(None, rec)["validation"] == "granite unavailable"

@@ -7,7 +7,8 @@ import pandas as pd
 from fastapi import FastAPI, Header, HTTPException
 from pydantic import BaseModel
 from src.models.financial_twins import _matrix, TOL, FEATS, MIN_SHARED, quality
-from src.explainability.reviewer_notes import make_note
+import subprocess
+from src.explainability.reviewer_notes import make_note, facts_for, finalize, DENIAL
 
 P = Path(os.environ.get("SL_DATA", "data/processed"))
 VERSION = "secondlook-0.1"
@@ -137,13 +138,35 @@ def analyse(a: Sim):
 
 class NoteReq(BaseModel):
     app_id: str
+    use_granite: bool = True
+
+CACHE = P / "notes_cache.json"
+GRANITE_CMD = os.environ.get("SL_GRANITE_CMD", "docker exec -i notebook curl -s --max-time 120 -X POST --data-binary @- localhost:8001/note")
+
+def _cache():
+    try: return json.loads(CACHE.read_text())
+    except Exception: return {}
+
+def _granite(facts: dict):
+    try:
+        r = subprocess.run(GRANITE_CMD, shell=True, input=json.dumps({"facts": facts}), capture_output=True, text=True, timeout=150)
+        return json.loads(r.stdout) if r.returncode == 0 and r.stdout else None
+    except Exception:
+        return None
 
 @app.post("/generate-review-note")
 def note(req: NoteReq):
     if req.app_id not in queue.index: raise HTTPException(404, "not in queue")
+    c = _cache()
+    if req.app_id in c and req.use_granite: return {"app_id": req.app_id, "cached": True, **c[req.app_id]}
     q = queue.loc[req.app_id]; r = apps[apps.app_id == req.app_id].iloc[0]
     reasons = application(req.app_id).get("denial_reasons", [])
     rec = {"quality": q.quality, "n_strong": int(q.n_strong), "n_candidates": int(q.n_candidates), "dist": float(q.dist),
-           "same_lender": True, "missing": [f for f in FEATS if pd.isna(r[f])], "denial_reasons": [f"code {x}" for x in reasons]}
-    text = make_note(rec); _log({"event": "note", "app_id": req.app_id, "generator": "template"})
-    return {"app_id": req.app_id, "generator": "deterministic-template", "note": text}
+           "same_lender": True, "missing": [f for f in FEATS if pd.isna(r[f])], "denial_reasons": [DENIAL.get(x, f"code {x}") for x in reasons]}
+    g = _granite(facts_for(rec)) if req.use_granite else None
+    out = finalize(g["text"] if g else None, rec)
+    if g: out.update(granite_gen_ms=g["gen_ms"], granite_tokens=g["n_tokens"])
+    _log({"event": "note", "app_id": req.app_id, "generator": out["generator"], "validation": out["validation"]})
+    if out["generator"].startswith("granite"):
+        c[req.app_id] = out; CACHE.write_text(json.dumps(c))
+    return {"app_id": req.app_id, "cached": False, **out}
