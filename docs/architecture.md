@@ -2,43 +2,43 @@
 
 ```mermaid
 flowchart TD
-    A[HMDA 2025 LAR - Maryland<br/>FFIEC Data Browser API] --> B[Preprocess + cohort filter<br/>src/data/preprocess.py]
-    B --> C1[applications<br/>financial matching features only]
-    B --> C2[audit_only<br/>race / ethnicity / sex / age]
-    B --> C3[denial_context<br/>reasons + AUS ids - display only]
+    A["HMDA 2025 LAR, Maryland<br/>FFIEC Data Browser API"] --> B["Preprocess and cohort filter<br/>src/data/preprocess.py"]
+    B --> C1["applications<br/>financial matching features only"]
+    B --> C2["audit_only<br/>race, ethnicity, sex, age"]
+    B --> C3["denial_context<br/>reasons and AUS ids, display only"]
     C1 --> M
 
-    subgraph LNX["IBM LinuxONE VM (s390x) - Ubuntu, 3 vCPU"]
-      M[Constrained financial-twin matching<br/>+ review priority score]
-      F[Blind fairness audit<br/>match on finances -> then reveal]
-      S[Model Sensitivity Analysis<br/>logreg + XGBoost]
-      API[FastAPI :8000 (3 workers)<br/>token-gated demographic endpoints<br/>audit log]
-      subgraph CT["Provided JupyterLab container"]
-        G[IBM Granite 4.0-H 350M base<br/>llama.cpp - note server :8001]
+    subgraph LNX["IBM LinuxONE VM, s390x, Ubuntu, 3 vCPU"]
+      M["Constrained financial-twin matching<br/>and review priority score"]
+      F["Blind fairness audit<br/>match on finances, then reveal"]
+      S["Model sensitivity analysis<br/>logistic regression and XGBoost"]
+      API["FastAPI :8000, 3 workers<br/>token-gated demographic endpoints<br/>audit log"]
+      subgraph CT["IBM-provided JupyterLab container"]
+        G["IBM Granite 4.0-H 350M base<br/>llama.cpp note server :8001"]
       end
       M --> API
       F --> API
       S --> API
-      C2 -.only after matching.-> F
-      C2 -.-> S
-      API <-->|facts JSON -> note, validated| G
+      API <-->|"facts in, validated note out"| G
     end
+    C2 -. "only after matching" .-> F
+    C2 -.-> S
 
-    X[SHED 2025 survey<br/>weighted context] --> API
-    Y[ACS 2024 5-yr county context] --> API
-    API -->|SSH tunnel :22| UI[Streamlit dashboard<br/>8 pages]
-    UI --> R[Human reviewer: no automatic decisions]
+    X["SHED 2025 survey<br/>weighted context"] --> API
+    Y["ACS 2024 5-year<br/>county context"] --> API
+    API -->|"SSH tunnel :22"| UI["Streamlit dashboard<br/>8 pages"]
+    UI --> R["Human reviewer<br/>no automatic decisions"]
 ```
 
 ## Review workflow
 ```mermaid
 flowchart LR
-  A[Financial Twins Matching Engine<br/>find comparable applications] --> B[Structured Case Evidence<br/>financial differences, denial reasons, missing information]
-  B --> C[Reason-aware check<br/>stated reasons vs reported data]
-  B --> D[IBM Granite<br/>explanation, validated against the facts]
-  C --> E[Human Reviewer<br/>asks grounded questions, records decision]
+  A["Financial Twins Matching Engine<br/>find comparable applications"] --> B["Structured Case Evidence<br/>financial differences, denial reasons, missing information"]
+  B --> C["Reason-aware check<br/>stated reasons vs reported data"]
+  B --> D["IBM Granite<br/>explanation, validated against the facts"]
+  C --> E["Human Reviewer<br/>asks grounded questions, records decision"]
   D --> E
-  E --> F[(Append-only audit log<br/>model version, match quality, tolerances)]
+  E --> F[("Append-only audit log<br/>model version, match quality, tolerances")]
 ```
 Granite receives only the structured facts (counts, match quality, field names, stated reason names) - no dollar amounts, no demographics. Decisions are limited to three advisory options; the API rejects anything else (tested).
 
