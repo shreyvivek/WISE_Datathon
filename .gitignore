@@ -23,3 +23,6 @@ Participant Guidebook*.pdf
 
 # IBM-provided lab notebooks are not our code (rule 4); keep out of the repo
 /*.ipynb
+
+# raw screenshots (one shows an email address; the redacted PDF is in docs/proof)
+screenshots/
