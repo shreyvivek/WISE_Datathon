@@ -9,6 +9,8 @@ from pydantic import BaseModel
 from src.models.financial_twins import _matrix, TOL, FEATS, MIN_SHARED, quality
 import subprocess
 from src.explainability.reviewer_notes import make_note, facts_for, finalize, DENIAL
+from src.explainability.reason_check import reason_review, answer, QUESTIONS
+from src.models.financial_twins import TOL
 
 P = Path(os.environ.get("SL_DATA", "data/processed"))
 VERSION = "secondlook-0.1"
@@ -87,8 +89,10 @@ def review_queue(limit: int = 50, lei: str | None = None):
     q = queue[queue.eligible]
     if lei: q = q[q.lei == lei]
     q = q.head(limit).reset_index()
-    return q[["app_id", "lei", "county_code", "n_candidates", "n_strong", "quality", "dist", "completeness", "priority"]] \
-        .round(3).to_dict("records")
+    st = _latest_status()
+    out = q[["app_id", "lei", "county_code", "n_candidates", "n_strong", "quality", "dist", "completeness", "priority"]].round(3)
+    out["review_status"] = out.app_id.map(lambda i: st.get(i, "Pending review"))
+    return out.to_dict("records")
 
 def _app_row(app_id):
     r = apps[apps.app_id == app_id]
@@ -133,6 +137,75 @@ def ctx_shed(): return _json("shed_context.json")
 
 @app.get("/context/census")
 def ctx_census(): return _json("census_context.json")
+
+# ---- reason-aware review, grounded Q&A, auditable human decisions -------------------------------------------
+REVIEW_LOG = P / "review_log.jsonl"
+DECISIONS = ["Needs additional information", "Reviewed — no conclusion", "Escalate for further review"]
+
+def _read_log():
+    if not REVIEW_LOG.exists(): return []
+    return [json.loads(l) for l in REVIEW_LOG.read_text().splitlines() if l.strip()]
+
+def _latest_status():
+    st = {}
+    for e in _read_log(): st[e["app_id"]] = e["decision"]
+    return st
+
+def _case(app_id: str) -> dict:
+    r = _app_row(app_id)
+    if app_id not in queue.index: raise HTTPException(404, "not in queue")
+    t = twins[(twins.denied_id == app_id) & twins.quality.isin(["strong", "moderate"])].merge(apps, left_on="twin_id", right_on="app_id")
+    tw = [{f: (None if pd.isna(row[f]) else float(row[f])) for f in FEATS} for _, row in t.iterrows()]
+    app_d = {f: (None if pd.isna(r[f]) else float(r[f])) for f in FEATS}; app_d["dti_is_bracket"] = bool(r.dti_is_bracket)
+    codes = [c for c in (application(app_id).get("denial_reasons", [])) if c in DENIAL]
+    q = queue.loc[app_id]
+    rec = {"quality": q.quality, "n_strong": int(q.n_strong), "n_candidates": int(q.n_candidates), "dist": float(q.dist), "same_lender": True,
+           "missing": [f for f in FEATS if pd.isna(r[f])], "denial_reasons": [DENIAL[c] for c in codes]}
+    return {"reason_review": reason_review(app_d, tw, codes), "note_rec": rec, "n_comparators": len(tw)}
+
+@app.get("/application/{app_id}/reason-review")
+def reason_rev(app_id: str):
+    c = _case(app_id); return {"app_id": app_id, "n_comparators_used": c["n_comparators"], **c["reason_review"],
+                               "disclaimer": "Evidence check only; not a finding about the decision. Reasons are never used for matching."}
+
+class Ask(BaseModel):
+    app_id: str
+    question_id: str
+
+@app.get("/questions")
+def questions(): return QUESTIONS
+
+@app.post("/ask")
+def ask(a: Ask):
+    if a.question_id not in QUESTIONS: raise HTTPException(400, "unknown question")
+    c = _case(a.app_id); _log({"event": "ask", "app_id": a.app_id, "q": a.question_id})
+    return {"app_id": a.app_id, "question": QUESTIONS[a.question_id], "answer": answer(a.question_id, c), "generator": "structured-results (no free-form generation)"}
+
+class Decision(BaseModel):
+    app_id: str
+    decision: str
+    reviewer: str = "reviewer"
+    comment: str = ""
+
+@app.post("/review-decision")
+def review_decision(d: Decision):
+    if d.decision not in DECISIONS: raise HTTPException(400, f"decision must be one of {DECISIONS}")
+    if d.app_id not in queue.index: raise HTTPException(404, "not in queue")
+    q = queue.loc[d.app_id]
+    e = {"ts": datetime.datetime.utcnow().isoformat() + "Z", "app_id": d.app_id, "decision": d.decision, "reviewer": d.reviewer[:40], "comment": d.comment[:300],
+         "model_version": VERSION, "match_quality": q.quality, "priority": float(q.priority), "tolerances": TOL,
+         "note_generator": (_cache().get(d.app_id) or {}).get("generator", "none")}
+    with open(REVIEW_LOG, "a") as f: f.write(json.dumps(e) + "\n")
+    return {"recorded": True, "entry": e, "note": "Advisory workflow only: no loan decision is changed."}
+
+@app.get("/review-log")
+def review_log(app_id: str | None = None, limit: int = 100):
+    e = [x for x in _read_log() if not app_id or x["app_id"] == app_id]
+    return e[-limit:][::-1]
+
+@app.get("/evaluation")
+def evaluation():
+    return {"ranking": _json("ranking_eval.json"), "matching": _json("eval_results.json")}
 
 class Sim(BaseModel):
     lei: str; income: float | None = None; loan_amount: float; dti: float | None = None

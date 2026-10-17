@@ -31,6 +31,30 @@ def render():
         st.write(n["note"])
         st.caption(f"Generator: {n['generator']} | validation: {n['validation']} | " + ("cached" if n.get("cached") else "freshly generated")
                    + (f" | Granite {n['granite_gen_ms']/1000:.1f} s, {n['granite_tokens']} tokens" if n.get("granite_gen_ms") else ""))
+    st.subheader("Reason-aware review")
+    rr, _ = call("GET", f"/application/{sel}/reason-review")
+    st.write(rr["summary"])
+    if rr["items"]:
+        st.dataframe(pd.DataFrame(rr["items"])[["reason", "status", "detail"]].rename(columns={"reason": "Stated reason", "status": "Check against reported data", "detail": "Evidence"}),
+                     hide_index=True, width="stretch")
+    with st.expander("Evidence a reviewer could request"):
+        for e in rr["evidence_to_request"]: st.write("• " + e)
+    st.subheader("Ask SecondLook")
+    qs, _ = call("GET", "/questions")
+    qid = st.selectbox("Question", list(qs), format_func=lambda k: qs[k])
+    if st.button("Ask"):
+        ans, _ = call("POST", "/ask", json={"app_id": sel, "question_id": qid})
+        st.write(ans["answer"]); st.caption("Answer assembled from structured results only (no free-form generation); advisory.")
+    st.subheader("Record your review (auditable, advisory only)")
+    c1, c2 = st.columns([1, 2])
+    reviewer = c1.text_input("Reviewer", value="reviewer-1")
+    decision = c2.radio("Decision", ["Needs additional information", "Reviewed — no conclusion", "Escalate for further review"], horizontal=True)
+    comment = st.text_input("Comment (optional, max 300 chars)")
+    if st.button("Save review decision"):
+        e, _ = call("POST", "/review-decision", json={"app_id": sel, "decision": decision, "reviewer": reviewer, "comment": comment})
+        st.success("Recorded. " + e["note"])
+    hist, _ = call("GET", "/review-log", params={"app_id": sel})
+    if hist: st.dataframe(pd.DataFrame(hist)[["ts", "reviewer", "decision", "comment", "model_version", "match_quality"]], hide_index=True, width="stretch")
     st.caption("Distance = mean of per-feature differences in units of tolerance. It is not an approval probability.")
     with st.expander("Simulated incoming application (SIMULATION)"):
         lei = a["lei"]; inc = st.number_input("Income ($K)", 90.0); la = st.number_input("Loan amount", 280000.0)

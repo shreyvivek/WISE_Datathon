@@ -30,12 +30,30 @@ flowchart TD
     UI --> R[Human reviewer: no automatic decisions]
 ```
 
+## Review workflow (core innovation)
+```mermaid
+flowchart LR
+  A[Financial Twins Matching Engine<br/>find comparable applications] --> B[Structured Case Evidence<br/>financial differences, denial reasons, missing information]
+  B --> C[Reason-aware check<br/>stated reasons vs reported data]
+  B --> D[IBM Granite<br/>explanation, validated against the facts]
+  C --> E[Human Reviewer<br/>asks grounded questions, records decision]
+  D --> E
+  E --> F[(Append-only audit log<br/>model version, match quality, tolerances)]
+```
+Granite receives only the structured facts (counts, match quality, field names, stated reason names) - no dollar amounts, no demographics. Decisions are limited to three advisory options; the API rejects anything else (tested).
+
 ## Components
 - **Data separation (leak control):** matching code reads only `applications`; demographics are joined after matching (fairness) or only in the labelled sensitivity analysis. A test enforces this.
 - **API** (`src/api/main.py`): `/health /summary /lenders /review-queue /application/{id} /application/{id}/twins /analyse-application (SIMULATION) /generate-review-note /fairness-report* /model-sensitivity* /context/shed /context/census /metrics`. *Require `X-Audit-Token`.
   Every response carries `X-Process-Ms`; the audit log (`audit_log.jsonl`) records version, event and latency only, no demographics or financials.
 - **Granite** (`src/explainability/`): facts JSON -> few-shot prompt -> Granite -> validator (no invented numbers, no accusatory wording) -> template fallback; validated notes are cached. Server runs in the lab container; the host API reaches it via `docker exec ... curl` (`SL_GRANITE_CMD`).
 - **Services:** `scripts/secondlook-api.service`, `scripts/secondlook-granite.service` (systemd; restart on failure, survive reboot as long as the lab container is up).
+
+## Why LinuxONE fits this workload (and what we measured, not assumed)
+- **Data stays in a controlled backend:** matching, scoring, the demographic audit and the generative step all run on the VM; the Granite step sees only de-identified structured facts; demographic endpoints are token-gated; logs hold no financials or demographics; the only internet exposure is SSH.
+- **One platform for the whole workflow:** predictive ML (matching, XGBoost), generative AI (Granite in the provided container) and the API run side by side with containers + systemd.
+- **Throughput:** matching is precomputed once (batch audit of 37,491 applications in under a second for the same-lender scope) and interactive analysis is on demand (~4 ms median); notes are cached because Granite is slow. Measured numbers are in `docs/model_evaluation.md`.
+- **Not claimed:** that LinuxONE was faster than a laptop (it was not), or hardware acceleration (zDNN initialises but offload was no faster).
 
 ## What runs where / what is and is not claimed
 - LinuxONE: matching, scoring, fairness audit, XGBoost sensitivity model, Granite notes, API. Same results as on arm64 (identical digests).

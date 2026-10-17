@@ -50,3 +50,25 @@ def test_shed_weighted_proportion_and_context_files():
     assert "mortgage_item" not in s and "cannot be linked" in s["caveat"]
     c = json.load(open("data/processed/census_context.json"))
     assert c["n_counties"] >= 20 and all(len(x["county_code"]) == 5 for x in c["counties"])
+
+
+def test_reason_review_is_evidence_bound():
+    from src.explainability.reason_check import reason_review, answer
+    app = {"dti": 44.0, "ltv": 80.0, "dti_is_bracket": False}; tw = [{"dti": 36.0, "ltv": 79.0}, {"dti": 38.0, "ltv": 81.0}, {"dti": 37.0, "ltv": 80.0}]
+    r = reason_review(app, tw, ["1", "3", "4", "10"])
+    st = {i["code"]: i["status"] for i in r["items"]}
+    assert st["1"].startswith("Consistent") and st["3"] == "Not assessable with public data" and st["4"].startswith("Not distinguished") and "10" not in st
+    assert reason_review({"dti": None}, tw, ["1"])["items"][0]["status"].startswith("Cannot assess")
+    case = {"reason_review": r, "note_rec": {"quality": "strong", "n_strong": 3, "n_candidates": 10, "dist": 0.3, "same_lender": True, "missing": [], "denial_reasons": []}}
+    for q in ["why_flagged", "what_could_explain", "missing_info", "evidence_to_request", "reason_consistency"]:
+        a = answer(q, case).lower(); assert "discriminat" not in a and "unfair" not in a
+
+
+def test_review_decision_api_is_advisory_and_audited(tmp_path):
+    from fastapi.testclient import TestClient
+    import src.api.main as m
+    m.REVIEW_LOG = tmp_path / "log.jsonl"; c = TestClient(m.app); i = c.get("/review-queue?limit=1").json()[0]["app_id"]
+    assert c.post("/review-decision", json={"app_id": i, "decision": "Approve loan"}).status_code == 400        # cannot change a loan decision
+    assert c.post("/review-decision", json={"app_id": i, "decision": "Escalate for further review", "reviewer": "t"}).json()["recorded"]
+    log = c.get(f"/review-log?app_id={i}").json(); assert len(log) == 1 and log[0]["model_version"] and "tolerances" in log[0]
+    assert c.get("/review-queue?limit=1").json()[0]["review_status"] == "Escalate for further review"

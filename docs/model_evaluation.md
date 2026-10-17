@@ -90,3 +90,26 @@ Historical decisions are not an approval standard; Model B is for auditing only.
 Setup: uvicorn with 3 worker processes (systemd), ~118 MB resident per worker. With a single worker the same endpoint plateaued at ~240 req/s regardless of client count (latency grew linearly with clients) - the
 single-process limit - so moving to 3 workers gave ~1.9x peak throughput. The load generator shares the same 3 vCPUs, so these are conservative. (A first 3-worker run with a keep-alive client showed a flat ~50 ms floor that
 disappeared with new connections - a client/TCP delayed-ACK artifact, not server compute.) `/metrics` is now per worker process.
+
+## Ranking evaluation vs baselines (SYNTHETIC; `python -m src.models.run_ranking_eval`)
+200 real approved applications are perturbed and relabelled 'denied' (injected inconsistencies with known labels), ranked together with 2,600 real denials; mean of 5 seeds. Precision@K / Recall@K for the injected cases.
+
+**easy (1-3% perturbation)**
+| method | K=100 | K=200 | K=400 |
+|---|---|---|---|
+| Baseline A: same-lender nearest (Euclid) | P=0.48 / R=0.24 | P=0.59 / R=0.59 | P=0.50 / R=1.00 |
+| Baseline B: global nearest approved | P=0.00 / R=0.00 | P=0.00 / R=0.00 | P=0.04 / R=0.07 |
+| SecondLook (constrained + priority score) | P=0.13 / R=0.07 | P=0.34 / R=0.34 | P=0.31 / R=0.62 |
+| SecondLook variant: tightest constrained match first | P=0.06 / R=0.03 | P=0.30 / R=0.30 | P=0.47 / R=0.93 |
+| random | P=0.08 / R=0.04 | P=0.09 / R=0.09 | P=0.07 / R=0.15 |
+
+**harder (6-12% perturbation)**
+| method | K=100 | K=200 | K=400 |
+|---|---|---|---|
+| Baseline A: same-lender nearest (Euclid) | P=0.01 / R=0.00 | P=0.01 / R=0.01 | P=0.05 / R=0.10 |
+| Baseline B: global nearest approved | P=0.00 / R=0.00 | P=0.00 / R=0.00 | P=0.00 / R=0.01 |
+| SecondLook (constrained + priority score) | P=0.00 / R=0.00 | P=0.02 / R=0.02 | P=0.05 / R=0.10 |
+| SecondLook variant: tightest constrained match first | P=0.00 / R=0.00 | P=0.01 / R=0.01 | P=0.03 / R=0.07 |
+| random | P=0.08 / R=0.04 | P=0.09 / R=0.09 | P=0.07 / R=0.15 |
+
+Honest reading: (1) the lender constraint matters - an unconstrained global search finds nothing. (2) A plain same-lender similarity ranking (Baseline A) matches or beats our composite priority score at recovering near-duplicate injected cases, so **we do not claim better ranking accuracy than simple similarity**. The composite score also rewards having several strong comparators, which 40% of the injected cases lack. (3) At the harder perturbation level no method beats random: such cases are not distinguishable from ordinary denials. (4) 195 real denials already have a near-identical approved comparator (distance <= 0.15), so injected-only precision has a ceiling well below 1. (5) SecondLook's value is evidence quality and workflow, not a ranking accuracy win: feature-specific tolerances, missing-data handling, match-quality labels, 'insufficient comparable evidence' (874 denials not queued), reason-aware checks, grounded Q&A, and an audit trail. Review time and real workload reduction were NOT measured (only triage counts: 1,726 of 2,600 denials queued).
