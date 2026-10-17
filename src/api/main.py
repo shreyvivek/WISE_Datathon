@@ -117,6 +117,23 @@ def fairness_report(x_audit_token: str | None = Header(None)):
             "caveat": "Public HMDA lacks credit scores; a matched gap is not proof of discrimination.",
             "results": json.loads(fair.to_json(orient="records"))}
 
+def _json(name):
+    f = P / name
+    if not f.exists(): raise HTTPException(404, f"{name} not deployed")
+    return json.loads(f.read_text())
+
+@app.get("/model-sensitivity")
+def model_sensitivity(x_audit_token: str | None = Header(None)):
+    if AUDIT_TOKEN and x_audit_token != AUDIT_TOKEN: raise HTTPException(403, "demographic audit access restricted")
+    return {"label": "Model Sensitivity Analysis (exploratory)", "models": {k: _json(f"model_sensitivity_{k}.json") for k in ("logreg", "xgb")},
+            "caveat": "Predicts historical decisions; not evidence any lender used race; omitting race does not remove proxies."}
+
+@app.get("/context/shed")
+def ctx_shed(): return _json("shed_context.json")
+
+@app.get("/context/census")
+def ctx_census(): return _json("census_context.json")
+
 class Sim(BaseModel):
     lei: str; income: float | None = None; loan_amount: float; dti: float | None = None
     ltv: float | None = None; property_value: float | None = None; loan_term: float | None = 360

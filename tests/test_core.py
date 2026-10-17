@@ -40,3 +40,13 @@ def test_granite_output_is_validated():
     assert finalize(good.replace("277", "999"), rec)["generator"] == "deterministic-template"               # invented number
     assert finalize("The lender discriminated against this applicant in 3 cases out of 277.", rec)["generator"] == "deterministic-template"
     assert finalize(None, rec)["validation"] == "granite unavailable"
+
+
+def test_shed_weighted_proportion_and_context_files():
+    import json
+    from src.context.shed import wprop
+    assert abs(wprop(np.array([1.0, 0.0]), np.array([3.0, 1.0])) - 0.75) < 1e-9
+    s = json.load(open("data/processed/shed_context.json"))
+    assert "mortgage_item" not in s and "cannot be linked" in s["caveat"]
+    c = json.load(open("data/processed/census_context.json"))
+    assert c["n_counties"] >= 20 and all(len(x["county_code"]) == 5 for x in c["counties"])

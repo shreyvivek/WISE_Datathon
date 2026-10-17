@@ -8,4 +8,4 @@ human review, and reports demographic patterns only as observed disparities (nev
     .venv/bin/python -m pytest tests
     .venv/bin/streamlit run dashboard/app.py          # local; set SL_API_URL=http://<linuxone>:8000 for remote
     .venv/bin/uvicorn src.api.main:app --port 8000
-Docs: `docs/`. Status: MVP works locally, Granite notes and Model Sensitivity Analysis are in, and the API is deployed on the LinuxONE VM; Granite notes, ablation model are pending.
+Docs: `docs/`. Status: MVP works locally, Granite notes, Model Sensitivity Analysis, SHED and Census context are in, and the API is deployed on the LinuxONE VM; Granite notes, ablation model are pending.

@@ -8,4 +8,4 @@ def render():
     pick = st.multiselect("Lenders (LEI)", d.lei.tolist(), default=d.lei.tolist()[:5])
     d["coverage"] = (d.denied_with_comparator / d.denied.replace(0, float("nan"))).round(3)
     st.dataframe(d[d.lei.isin(pick)].rename(columns={"denial_rate": "denial rate", "denied_with_comparator": "denied w/ same-lender comparator",
-                 "coverage": "comparable-case coverage"}), use_container_width=True, hide_index=True)
+                 "coverage": "comparable-case coverage"}), width="stretch", hide_index=True)

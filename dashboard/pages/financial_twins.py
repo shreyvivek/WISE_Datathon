@@ -14,7 +14,7 @@ def render():
     for i, tw in enumerate(t[:3], 1):
         cols[f"Twin {i} ({tw['quality']}, d={tw['dist']:.2f})"] = {l: tw.get(k) for k, l in ROWS}
     df = pd.DataFrame(cols); df.loc["Outcome"] = ["Denied"] + ["Approved"] * (len(df.columns) - 1)
-    st.dataframe(df.astype(object).fillna("not reported"), use_container_width=True)
+    st.dataframe(df.astype(object).fillna("not reported").astype(str), width="stretch")
     c1, c2 = st.columns(2)
     c1.metric("Best match quality", t[0]["quality"].upper() if t else "n/a")
     c2.metric("Largest single-feature gap (tolerances)", f"{t[0]['max_diff']:.1f}" if t else "n/a")
@@ -24,8 +24,13 @@ def render():
     st.write("Stated denial reason(s) (context only; not used for matching): " + (", ".join(rs) or "none reported"))
     comp = a.get("priority_components")
     if comp: st.write("Priority breakdown:", {k: comp[k] for k in ("c_match", "c_count", "c_lender", "c_complete", "priority")})
+    use_g = st.checkbox("Use IBM Granite (runs on LinuxONE; ~15-45 s unless cached)", value=True)
     if st.button("Generate reviewer note"):
-        st.write(call("POST", "/generate-review-note", json={"app_id": sel})[0]["note"])
+        with st.spinner("Generating..."):
+            n, _ = call("POST", "/generate-review-note", json={"app_id": sel, "use_granite": use_g})
+        st.write(n["note"])
+        st.caption(f"Generator: {n['generator']} | validation: {n['validation']} | " + ("cached" if n.get("cached") else "freshly generated")
+                   + (f" | Granite {n['granite_gen_ms']/1000:.1f} s, {n['granite_tokens']} tokens" if n.get("granite_gen_ms") else ""))
     st.caption("Distance = mean of per-feature differences in units of tolerance. It is not an approval probability.")
     with st.expander("Simulated incoming application (SIMULATION)"):
         lei = a["lei"]; inc = st.number_input("Income ($K)", 90.0); la = st.number_input("Loan amount", 280000.0)

@@ -11,7 +11,7 @@ def render():
     st.dataframe(q.rename(columns={"app_id": "Record", "lei": "Lender", "n_strong": "Strong comparators", "quality": "Match quality",
                                    "completeness": "Completeness", "priority": "Priority"})
                  [["Record", "Lender", "Loan category", "Strong comparators", "Match quality", "Completeness", "Priority", "Review status"]],
-                 use_container_width=True, hide_index=True)
+                 width="stretch", hide_index=True)
     c1, c2 = st.columns(2)
     rec = c1.selectbox("Record", q.app_id)
     opt = c2.selectbox("Mark as", ["Needs additional information", "Reviewed — no conclusion", "Escalate for further review"])

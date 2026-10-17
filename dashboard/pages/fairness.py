@@ -24,7 +24,7 @@ def render():
                                  array=[raw_ci[1] - x.raw_gap_pp, m_ci[1] - x.matched_gap_pp],
                                  arrayminus=[x.raw_gap_pp - raw_ci[0], x.matched_gap_pp - m_ci[0]])))
         fig.add_vline(x=0, line_dash="dot"); fig.update_layout(height=220, xaxis_title="Denial-rate gap (percentage points, 95% CI)", margin=dict(t=10))
-        st.plotly_chart(fig, use_container_width=True)
+        st.plotly_chart(fig, width="stretch")
         st.write(f"Raw denial rate {x.raw_rate_group:.1%} vs {x.raw_rate_ref:.1%} (n={x.n_group:,} / {x.n_ref:,}). "
                  f"Matched: {x.matched_rate_group:.1%} vs {x.matched_rate_ref:.1%} on {x.n_matched:,} strong pairs "
                  f"(coverage {x.coverage:.0%} of the group).")
