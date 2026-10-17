@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SecondLook</title>
+<link rel="preload" href="fonts/Manrope.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="app.css?v=16">
+</head>
+<body>
+<div class="shell">
+  <nav class="side">
+    <div class="brand"><span class="logo">S</span><div><b>SecondLook</b><small>advisory review</small></div></div>
+    <a href="#overview" data-nav="overview"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="9" rx="1.5"/><rect x="14" y="3" width="7" height="5" rx="1.5"/><rect x="14" y="12" width="7" height="9" rx="1.5"/><rect x="3" y="16" width="7" height="5" rx="1.5"/></svg>Overview</a>
+    <a href="#queue" data-nav="queue"><svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>Queue</a>
+    <a href="#compare" data-nav="compare"><svg viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8l4-4 4 4M13 16l4 4 4-4"/></svg>Compare</a>
+    
+    <a href="#fairness" data-nav="fairness"><svg viewBox="0 0 24 24"><path d="M12 3v18M4 7h16M6 7l-3 7a3 3 0 0 0 6 0L6 7zM18 7l-3 7a3 3 0 0 0 6 0l-3-7z"/></svg>Fairness</a>
+    <a href="#simulate" data-nav="simulate"><svg viewBox="0 0 24 24"><path d="M6 4l14 8-14 8z"/></svg>Simulate</a>
+    <a href="#system" data-nav="system"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="6" rx="1.5"/><rect x="3" y="14" width="18" height="6" rx="1.5"/><path d="M7 7h.01M7 17h.01"/></svg>System</a>
+    <div class="side-foot">
+      <span id="mode-badge" class="badge">…</span>
+      <small>Advisory only. Nothing here approves or overturns a loan.</small>
+    </div>
+  </nav>
+  <main id="view"></main>
+</div>
+<div id="toast"></div>
+<script src="mock.js?v=16"></script>
+<script src="api.js?v=16"></script>
+<script src="app.js?v=16"></script>
+</body>
+</html>
