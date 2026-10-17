@@ -1,0 +1,19 @@
+[Unit]
+Description=SecondLook Granite note server (inside the provided LinuxONE JupyterLab container)
+After=docker.service
+Requires=docker.service
+
+[Service]
+Type=simple
+User=linux1
+# waits for the lab container, then runs the server in the foreground so systemd can restart it
+ExecStartPre=/bin/bash -c 'for i in $(seq 1 30); do docker exec notebook true && exit 0; sleep 2; done; exit 1'
+ExecStartPre=/usr/bin/docker exec notebook /opt/venv/bin/python /home/ibm-user/secondlook/kill_granite.py
+ExecStartPre=/bin/sleep 2
+ExecStart=/usr/bin/docker exec notebook /opt/venv/bin/python /home/ibm-user/secondlook/src/explainability/granite_server.py 8001
+ExecStop=/usr/bin/docker exec notebook /opt/venv/bin/python /home/ibm-user/secondlook/kill_granite.py
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

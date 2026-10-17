@@ -1,0 +1,46 @@
+== collected 2026-10-17T15:01:45Z on wise-datathon
+== architecture / resources
+Linux wise-datathon 6.8.0-147-generic #147-Ubuntu SMP Thu Sep 24 10:59:43 UTC 2026 s390x s390x s390x GNU/Linux
+3
+               total        used        free      shared  buff/cache   available
+Mem:            8009        5413        1561           9        1181        2595
+== CPU facilities (note: nnpa listed; SecondLook CPU code does not use it)
+Architecture:                            s390x
+Byte Order:                              Big Endian
+Model name:                              -
+nnpa sie vxe2 
+== services
+active
+active
+== API health / summary
+{"status":"ok","arch":"s390x","python":"3.12.3","model_load_s":0.153,"version":"secondlook-0.1"}
+{"applications":37491,"denied":2600,"lenders":447,"denied_with_strong_comparator":1338,"review_queue_size":1726,"insufficient_evidence":874,"missing_share":{"income":0.008,"loan_amount":0.0,"dti":0.00
+
+== API benchmark (300 sequential /analyse-application, simulated input)
+ "median_ms": 4.519295496720588,
+ "p95_ms": 10.738044999015983,
+ "throughput_rps": 173.56757980018216,
+  "model_load_s": 0.153,
+  "median_ms": 3.3756449993234128,
+  "p95_ms": 9.20147199503844,
+  "max_rss_mb": 114.5078125,
+  "model_load_s": 0.1533441620049416
+== full matching on this host (digests equal arm64 results)
+arch s390x rows 37491
+lender: 0.68s pairs=7621 strong_best=1338 digest=3c61072b7f
+lender_msa: 1.22s pairs=7333 strong_best=986 digest=336b6e4fb6
+market: 5.33s pairs=7683 strong_best=2051 digest=ee656dbcf1
+max_rss_mb 812.46875
+== Granite server
+{"model": "granite-4.0-h-350m-base-be.f16.gguf", "load_s": 0.57, "n_ctx": 2048}
+== zDNN / NNPA backend lines from llama.cpp (offload then disabled: measured no speed-up)
+load_tensors:         zDNN model buffer size =   501.47 MiB
+ggml_zdnn_init: allocating
+ggml_zdnn_init: found 1 device
+ggml_zdnn_init: picking default device: zDNN
+ggml_zdnn_init: NNPA name: zDNN
+ggml_zdnn_init: NNPA_PARMBLKFORMAT_0 = true
+ggml_zdnn_init: NNPA_PARMBLKFORMAT_1 = true
+zDNN : NNPA = 1 | NNPA_PARMBLKFORMAT_0 = 1 | NNPA_PARMBLKFORMAT_1 = 1 | CPU : LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+== cached validated Granite notes
+26 cached notes; generators: ['granite-4.0-h-350m-base']
