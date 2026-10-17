@@ -12,7 +12,7 @@ Distance = mean over shared features. strong: dist<=0.75 & max<=2; moderate: dis
 **Disparity:** within-lender 1-NN (with replacement) from each group's applications to White applications, financial features only; only strong
 pairs used; bootstrap 1,000 resamples of the group's pairs. Raw-gap CI bootstraps both groups. Observed/adjusted disparity only.
 **Limitations:** no credit scores/assets/employment in public HMDA; historical decisions are not ground truth; matched controls reused; CIs ignore
-matching uncertainty; race "Not Available"/Joint excluded from comparisons; location as a proxy for race is not yet evaluated; DTI bracket midpoints add noise;
+matching uncertainty; race "Not Available"/Joint excluded from comparisons; finances and county partly predict race (proxy check in `docs/model_evaluation.md`); DTI bracket midpoints add noise;
 exact-duplicate records (round-number loans) yield distance 0 and create ties at priority 100.
 
 ## Supplementary context data
@@ -22,4 +22,4 @@ lacks strata/PSU variables). Items cover ALL credit types, not mortgages; the mo
 **Census ACS 2024 5-year** (`src/context/census.py`): county median household income (B19013_001E) and population (B01003_001E) for Maryland counties, joined to HMDA by county FIPS (24 counties with >=30 applications).
 The official API (api.census.gov) now rejects keyless calls (redirect to `missing_key`), and no key was available, so the data came from Census Reporter (same release, id `acs2024_5yr`, 2020-2024).
 Set `CENSUS_API_KEY` to use the official API instead (code path implemented, not exercised). County-level association (Spearman income vs denial rate = -0.45) is ecological and says nothing about individuals.
-HMDA's own tract fields (tract income percentage, minority share) are available but not yet used in matching.
+HMDA's own tract fields (tract income percentage, minority share) are available but are not used in matching.

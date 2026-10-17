@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# Terminal walkthrough of the LinuxONE side for the video. Press Enter to advance each step (use --auto to run without pauses).
-# Usage: scripts/demo_ibm.sh [--auto]            all 7 steps (~30 s)
-#        STEPS="1 2 4" scripts/demo_ibm.sh        only some steps (video: STEPS="1 2 4 5")   (needs wise_key.pem in the repo root; shows no secrets)
+# Step-by-step terminal walkthrough of the LinuxONE deployment: machine, services, live request, load, Granite, access control.
+# Press Enter to run each step, or pass --auto to run without pauses.
+# Usage: scripts/linuxone_walkthrough.sh [--auto]
+#        STEPS="1 2 4 5" scripts/linuxone_walkthrough.sh     (run only some steps)
+# Needs wise_key.pem in the repo root; prints no secrets.
 KEY=${KEY:-wise_key.pem}; HOST=${HOST:-linux1@148.100.109.157}; AUTO=$1
 RUN=1
-CP="-o ControlMaster=auto -o ControlPath=/tmp/sl-demo-%r@%h -o ControlPersist=120"  # one SSH connection reused by every step (faster)
+CP="-o ControlMaster=auto -o ControlPath=/tmp/sl-ssh-%r@%h -o ControlPersist=120"  # one SSH connection reused by every step (faster)
 R() { [ "$RUN" = 1 ] || return 0; ssh $CP -i "$KEY" -o BatchMode=yes -o LogLevel=ERROR "$HOST" "$1"; }
 COUNT=0
 step() { n=${1%%.*}; if [ -n "$STEPS" ] && [[ " $STEPS " != *" $n "* ]]; then RUN=0; return; fi; RUN=1; COUNT=$((COUNT+1)); printf '\n\033[1m== Step %s: %s\033[0m\n' "$COUNT" "${1#*. }"; [ "$AUTO" = "--auto" ] || read -r -p "   (Enter to run) " _; }

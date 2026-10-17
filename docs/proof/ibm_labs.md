@@ -1,5 +1,5 @@
-# Mandatory IBM labs - completion check (read from the notebooks on the LinuxONE VM, 2026-10-17)
-Counted from the executed notebooks in the provided JupyterLab container (`/home/ibm-user/`). The notebooks are IBM-provided and are not part of this repository.
+# IBM lab notebooks (read from the LinuxONE VM, 2026-10-17)
+Execution status of the notebooks in the IBM-provided JupyterLab container (`/home/ibm-user/`). The notebooks are IBM material and are not part of this repository.
 | Notebook | Role | Code cells executed | Errors |
 |---|---|---|---|
 | Churn_Scikit_PyTorch | Predictive AI / multi-model | 31 of 44 (the 13 unexecuted are empty trailing cells) | 0 |

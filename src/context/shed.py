@@ -1,8 +1,24 @@
 """Federal Reserve SHED 2025: weighted, SUPPLEMENTARY credit-access context. Never joined to HMDA applicants (different populations).
 Base for A1_* items = respondents who applied for any credit in the past 12 months (A0 = Yes). Uses `weight` (scaled to sample size);
 CIs are a respondent-level weighted bootstrap (approximate; the public file has no strata/PSU design variables)."""
-import json
+import io, json, zipfile
+from pathlib import Path
 import numpy as np, pandas as pd
+import requests
+
+URL = "https://www.federalreserve.gov/consumerscommunities/files/SHED_public_use_data_2025_%28CSV%29.zip"
+CSV = Path("data/raw/shed/public2025.csv")
+
+
+def download() -> Path:
+    """Fetch the public-use SHED 2025 CSV from the Federal Reserve (skipped if already present)."""
+    if not CSV.exists():
+        r = requests.get(URL, timeout=120); r.raise_for_status()
+        CSV.parent.mkdir(parents=True, exist_ok=True)
+        with zipfile.ZipFile(io.BytesIO(r.content)) as z:
+            CSV.write_bytes(z.read("public2025.csv"))
+    return CSV
+
 
 RACE = ["White", "Black", "Hispanic", "Asian", "Other"]
 ITEMS = {"A1_a": "Turned down for credit (past 12 months)", "A1_b": "Approved for less credit than requested",
@@ -19,7 +35,7 @@ def boot_ci(y, w, n_boot=1000, seed=0):
     return [float(np.percentile(s, 2.5)), float(np.percentile(s, 97.5))]
 
 
-def build(path="data/raw/shed/x/public2025.csv") -> dict:
+def build(path=CSV) -> dict:
     d = pd.read_csv(path, low_memory=False)
     yn = {"Yes": 1.0, "No": 0.0}
     for c in ["A0", *ITEMS]: d[c] = d[c].map(yn)  # labelled text in the public CSV
@@ -41,6 +57,6 @@ def build(path="data/raw/shed/x/public2025.csv") -> dict:
 
 
 if __name__ == "__main__":
-    r = build(); json.dump(r, open("data/processed/shed_context.json", "w"), indent=1)
+    download(); r = build(); json.dump(r, open("data/processed/shed_context.json", "w"), indent=1)
     for k, v in r["items"].items():
         print(k, v["label"]); [print("  ", x["group"].ljust(9), f"n={x['n']:5d}", f"{x['weighted_share']:.1%}", [f"{c:.1%}" for c in x["ci95"]], "SMALL-N" if x["small_n_warning"] else "") for x in v["by_group"]]

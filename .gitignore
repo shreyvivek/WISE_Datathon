@@ -1,28 +1,25 @@
-# secrets
+# secrets and local files
 *.pem
 *.key
 .env
-# data (large, re-downloadable)
+audit_log.jsonl
+api.log
+screenshots/
+/*.ipynb
+
+# generated data
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
 !data/processed/.gitkeep
-*.npy
 *.parquet
+*.npy
 *.onnx
 *.gguf
+
 # python
 __pycache__/
 .ipynb_checkpoints/
+.pytest_cache/
 .venv/
 .DS_Store
-audit_log.jsonl
-api.log
-.pytest_cache/
-Participant Guidebook*.pdf
-
-# IBM-provided lab notebooks are not our code (rule 4); keep out of the repo
-/*.ipynb
-
-# raw screenshots (one shows an email address; the redacted PDF is in docs/proof)
-screenshots/
