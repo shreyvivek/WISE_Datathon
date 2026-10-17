@@ -13,7 +13,7 @@ SecondLook is an advisory audit tool for historical mortgage decisions. For each
 - **Fairness audit.** Raw and matched denial-rate gaps with bootstrap intervals, sensitivity to matching settings, a proxy check, and an exploratory model sensitivity analysis. Context from the Federal Reserve SHED survey and Census ACS.
 
 ## Demo
-Dashboard walkthrough: https://drive.google.com/file/d/1Vd0Ypqad56WqJVWRt4pn1nwvkosohwOL/view?usp=sharing
+Demo video: https://drive.google.com/file/d/1Vd0Ypqad56WqJVWRt4pn1nwvkosohwOL/view?usp=sharing
 
 ## Results at a glance
 Maryland, HMDA 2025, one comparable cohort: 37,491 applications, 2,600 denied, 447 lenders. Details and caveats are in [`docs/model_evaluation.md`](docs/model_evaluation.md).
