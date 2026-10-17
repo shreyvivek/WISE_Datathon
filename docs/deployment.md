@@ -23,7 +23,7 @@ The API, the matching and scoring code, and the Granite note server run on a Lin
 ## Daily use
 - **Check the services:** `ssh -i wise_key.pem linux1@<vm-ip> 'uname -m; systemctl is-active secondlook-api secondlook-granite; curl -s localhost:8000/health'`
 - **Tunnel** (port 8000 is not reachable from the internet; only SSH is): `ssh -i wise_key.pem -N -L 18000:localhost:8000 linux1@<vm-ip>`
-- **Dashboard against the VM:** `set -a; . ./.env; set +a; SL_API_URL=http://localhost:18000 .venv/bin/streamlit run dashboard/app.py` (put the same `AUDIT_TOKEN` in your local `.env`). The sidebar shows `Backend: REMOTE` when it is connected.
+- **Dashboard against the VM:** `set -a; . ./.env; set +a; python3 ui_demo/serve.py --api http://localhost:18000`, then open http://localhost:8080. The sidebar badge shows `LIVE API` when connected. Put the same `AUDIT_TOKEN` as on the VM in your local `.env` for the Fairness page.
 - **Restart:** `sudo systemctl restart secondlook-api secondlook-granite` on the VM, then wait about 20 s.
 - **Walkthrough:** `scripts/linuxone_walkthrough.sh` steps through the instance, services, a live request, load and access control.
 - **Evidence and benchmarks:** `scripts/collect_proof.sh > docs/proof/linuxone_evidence.txt`; `scripts/benchmark.py` and `scripts/benchmark_concurrent.py http://localhost:8000` run on the VM.
@@ -31,4 +31,4 @@ The API, the matching and scoring code, and the Granite note server run on a Lin
 ## Notes
 - The API runs with 3 uvicorn workers; `/metrics` is therefore per worker process.
 - Only ports 22 (SSH) and 38888 (the lab's Jupyter) are reachable from the internet. The VM firewall accepts all traffic, so port 8000 is filtered upstream and cannot be opened from inside the VM.
-- Locally, `uvicorn src.api.main:app --port 8000` serves the same API from `data/processed` (parquet).
+- Locally, `uvicorn src.api.main:app --port 8000` serves the same API from `data/processed` (parquet), and the dashboard at `/ui`.

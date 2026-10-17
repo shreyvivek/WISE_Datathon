@@ -26,7 +26,7 @@ flowchart TD
 
     X["SHED 2025 survey<br/>weighted context"] --> API
     Y["ACS 2024 5-year<br/>county context"] --> API
-    API -->|"SSH tunnel :22"| UI["Streamlit dashboard<br/>8 pages"]
+    API -->|"SSH tunnel :22"| UI["Reviewer dashboard<br/>ui_demo, live API"]
     UI --> R["Human reviewer<br/>no automatic decisions"]
 ```
 
@@ -46,6 +46,7 @@ Granite receives only the structured facts (counts, match quality, field names, 
 - **Data separation (leak control):** matching code reads only `applications`; demographics are joined after matching (fairness) or only in the labelled sensitivity analysis. A test enforces this.
 - **API** (`src/api/main.py`): `/health /summary /lenders /review-queue /application/{id} /application/{id}/twins /analyse-application (SIMULATION) /generate-review-note /fairness-report* /model-sensitivity* /context/shed /context/census /metrics`. *Require `X-Audit-Token`.
   Every response carries `X-Process-Ms`; the audit log (`audit_log.jsonl`) records version, event and latency only, no demographics or financials.
+- **Reviewer dashboard** (`ui_demo/`): plain HTML and JavaScript single-page app (Overview, Queue, Compare, Case detail, Simulate, Fairness, System). It is served by `ui_demo/serve.py`, which proxies API calls through the SSH tunnel, or by the API itself at `/ui`, and falls back to labelled sample data when no API is reachable.
 - **Granite** (`src/explainability/`): facts JSON -> few-shot prompt -> Granite -> validator (no invented numbers, no accusatory wording) -> template fallback; validated notes are cached. Server runs in the lab container; the host API reaches it via `docker exec ... curl` (`SL_GRANITE_CMD`).
 - **Services:** `scripts/secondlook-api.service` and `scripts/secondlook-granite.service` (systemd; restart on failure and start on boot once the lab container is up). Setup: `docs/deployment.md`.
 

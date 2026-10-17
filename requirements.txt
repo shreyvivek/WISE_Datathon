@@ -8,6 +8,4 @@ requests
 httpx
 fastapi
 uvicorn
-streamlit
-plotly
 pytest

@@ -15,9 +15,9 @@ window.MOCK = (() => {
     const u = (rnd() * 2 - 1) * scale; t[f] = REL[f] ? +(v * (1 + u * TOL[f])).toFixed(0) : +(v + u * TOL[f]).toFixed(f === "loan_term" ? 0 : 1); } return t; };
   const dist = (a, b) => { let n = 0, sum = 0, mx = 0; for (const f of FEATS) { if (a[f] == null || b[f] == null) continue;
     const d = REL[f] ? Math.abs(a[f] - b[f]) / a[f] / TOL[f] : Math.abs(a[f] - b[f]) / TOL[f]; sum += d; mx = Math.max(mx, d); n++; } return { dist: n ? sum / n : Infinity, max_diff: mx, n }; };
-  const qual = (d, mx) => d <= 0.5 && mx <= 1 ? "strong" : d <= 1 && mx <= 1.5 ? "moderate" : "weak";
+  const qual = (d, mx) => d <= 0.75 && mx <= 2 ? "strong" : d <= 1.25 && mx <= 3 ? "moderate" : "weak"; // same cutoffs as src/models/financial_twins.py
 
-  // hero case from the demo script
+  // reference case (b81daae6eb) with the values reported in the deck
   const hero = { app_id: "b81daae6eb", lei: LENDERS[2].lei, county_code: "24031", outcome: "denied", income: 141, loan_amount: 615000, dti: 46, ltv: 95, property_value: 645000, loan_term: 360, dti_is_bracket: false, completeness: 1, denial_reasons: ["4"] }; // values as in the slide deck
   const heroTwins = [
     { income: 141, loan_amount: 615000, dti: 46, ltv: 95, property_value: 645000, loan_term: 360 },
@@ -29,8 +29,8 @@ window.MOCK = (() => {
     for (let k = 0; k < 7; k++) tw = tw.concat([perturb(a, 1.2 + k * 0.45)]); // wider pool of approved comparators, ranked by distance
     const list = tw.map((t, i) => { const d = dist(a, t); return { twin_id: hex(10), rank: i + 1, dist: +d.dist.toFixed(3), max_diff: +d.max_diff.toFixed(2), quality: qual(d.dist, d.max_diff), ...t }; }).sort((x, y) => x.dist - y.dist);
     twins[a.app_id] = list; const best = list[0]; const n_strong = list.filter(t => t.quality === "strong").length;
-    const c_match = Math.max(0, 1 - best.dist), c_count = Math.min(1, list.slice(0, 3).filter(t => t.quality === "strong").length / 3), c_lender = 0.4 + rnd() * 0.5, c_complete = a.completeness;
-    const priority = +(100 * (0.45 * c_match + 0.25 * c_count + 0.15 * c_lender + 0.15 * c_complete)).toFixed(1);
+    const c_match = Math.max(0, 1 - Math.min(best.dist, 1.25) / 1.25), c_count = Math.min(1, list.slice(0, 3).filter(t => t.quality === "strong").length / 3), c_lender = best.quality === "weak" ? 0 : 1, c_complete = a.completeness;
+    const priority = +(100 * (0.4 * c_match + 0.2 * c_count + 0.2 * c_lender + 0.2 * c_complete)).toFixed(1);  // same weights as src/models/prioritisation.py
     a.priority_components = { c_match: +c_match.toFixed(3), c_count: +c_count.toFixed(3), c_lender: +c_lender.toFixed(3), c_complete: +c_complete.toFixed(3), priority, status: best.quality === "weak" ? "Insufficient comparable evidence" : "Queued" };
     queue.push({ app_id: a.app_id, lei: a.lei, county_code: a.county_code, n_candidates: list.length, n_strong, quality: best.quality, dist: best.dist, completeness: a.completeness, priority, eligible: best.quality !== "weak" }); };
   add(hero, heroTwins);

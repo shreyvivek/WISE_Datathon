@@ -1,11 +1,11 @@
 """Serve the SecondLook UI locally.
     python3 ui_demo/serve.py                         -> http://localhost:8080  (bundled demo data)
     python3 ui_demo/serve.py --api http://localhost:18000   -> same page, API calls proxied to the LinuxONE tunnel (LIVE)
-Optional: --port 8080, --token <AUDIT_TOKEN> (added to proxied requests for the demographic endpoints)."""
+Optional: --port 8080. If AUDIT_TOKEN is set in the environment it is added to proxied requests for the demographic endpoints."""
 import argparse, http.server, os, urllib.request, urllib.error, webbrowser
-ap = argparse.ArgumentParser(); ap.add_argument("--port", type=int, default=8080); ap.add_argument("--api", default=""); ap.add_argument("--token", default="")
+ap = argparse.ArgumentParser(); ap.add_argument("--port", type=int, default=8080); ap.add_argument("--api", default="")
 ap.add_argument("pos_port", nargs="?", type=int)  # backwards compatible: serve.py 8080
-a = ap.parse_args(); port = a.pos_port or a.port; API = a.api.rstrip("/"); TOKEN = a.token
+a = ap.parse_args(); port = a.pos_port or a.port; API = a.api.rstrip("/"); TOKEN = os.environ.get("AUDIT_TOKEN", "")
 os.chdir(os.path.dirname(os.path.abspath(__file__)))
 API_PREFIXES = ("/health", "/metrics", "/summary", "/lenders", "/review-queue", "/application/", "/analyse-application", "/generate-review-note",
                 "/fairness-report", "/model-sensitivity", "/context/", "/questions", "/ask", "/review-decision", "/review-log", "/evaluation")

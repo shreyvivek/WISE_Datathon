@@ -72,3 +72,10 @@ def test_review_decision_api_is_advisory_and_audited(tmp_path):
     assert c.post("/review-decision", json={"app_id": i, "decision": "Escalate for further review", "reviewer": "t"}).json()["recorded"]
     log = c.get(f"/review-log?app_id={i}").json(); assert len(log) == 1 and log[0]["model_version"] and "tolerances" in log[0]
     assert c.get("/review-queue?limit=1").json()[0]["review_status"] == "Escalate for further review"
+
+
+def test_reviewer_dashboard_is_served_by_the_api():
+    from fastapi.testclient import TestClient
+    import src.api.main as m
+    c = TestClient(m.app)
+    assert c.get("/ui/").status_code == 200 and c.get("/ui/app.js").status_code == 200
