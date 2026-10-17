@@ -185,5 +185,5 @@ def note(req: NoteReq):
     if g: out.update(granite_gen_ms=g["gen_ms"], granite_tokens=g["n_tokens"])
     _log({"event": "note", "app_id": req.app_id, "generator": out["generator"], "validation": out["validation"]})
     if out["generator"].startswith("granite"):
-        c[req.app_id] = out; CACHE.write_text(json.dumps(c))
+        c[req.app_id] = out; tmp = CACHE.with_suffix(f".{os.getpid()}.tmp"); tmp.write_text(json.dumps(c)); tmp.replace(CACHE)  # atomic; several workers
     return {"app_id": req.app_id, "cached": False, **out}

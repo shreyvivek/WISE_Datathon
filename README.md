@@ -17,8 +17,25 @@ Docs: `docs/`. Status: MVP works locally, Granite notes, Model Sensitivity Analy
 | SHED 2025 public-use file | Federal Reserve Board | public use; used with survey weights, as context only |
 | ACS 2024 5-year (county) | US Census Bureau, via Census Reporter (official API needs a key) | public data |
 
-## Libraries (all open source)
-pandas, NumPy, SciPy, scikit-learn, XGBoost (BSD/Apache-2.0); FastAPI, Uvicorn, Pydantic, Requests, HTTPX (MIT/BSD/Apache-2.0); Streamlit (Apache-2.0), Plotly (MIT); PyArrow (Apache-2.0);
-pytest (MIT); llama.cpp / llama-cpp-python (MIT) in the IBM-provided LinuxONE container; IBM Granite 4.0-H 350M base (Apache-2.0), provided in that container.
-All SecondLook code in `src/`, `dashboard/`, `scripts/`, `tests/` was written during the datathon; the IBM loan demo notebook was not reused.
+## Libraries and open-source resources used (links per Datathon rule 5)
+| Library / resource | Link | Licence |
+|---|---|---|
+| pandas | https://pandas.pydata.org | BSD-3 |
+| NumPy | https://numpy.org | BSD-3 |
+| SciPy | https://scipy.org | BSD-3 |
+| scikit-learn | https://scikit-learn.org | BSD-3 |
+| XGBoost | https://github.com/dmlc/xgboost | Apache-2.0 |
+| FastAPI | https://fastapi.tiangolo.com | MIT |
+| Uvicorn | https://www.uvicorn.org | BSD-3 |
+| Pydantic | https://docs.pydantic.dev | MIT |
+| Requests / HTTPX | https://requests.readthedocs.io , https://www.python-httpx.org | Apache-2.0 / BSD-3 |
+| Streamlit | https://streamlit.io | Apache-2.0 |
+| Plotly | https://plotly.com/python | MIT |
+| PyArrow | https://arrow.apache.org | Apache-2.0 |
+| pytest | https://pytest.org | MIT |
+| llama.cpp / llama-cpp-python (IBM-provided LinuxONE container) | https://github.com/ggml-org/llama.cpp , https://github.com/abetlen/llama-cpp-python | MIT |
+| IBM Granite 4.0-H 350M base (IBM-provided in the container) | https://huggingface.co/ibm-granite | Apache-2.0 |
+| Mermaid (architecture diagram) | https://mermaid.js.org | MIT |
+All SecondLook code in `src/`, `dashboard/`, `scripts/`, `tests/` was written during the datathon window (first commit 2026-10-17); the IBM loan demo notebook was not reused.
+
 Docs: `docs/architecture.md`, `docs/runbook.md`, `docs/demo_script.md`, `docs/model_evaluation.md`, `docs/dataset_methodology.md`. LinuxONE evidence: `docs/proof/linuxone_evidence.txt`.

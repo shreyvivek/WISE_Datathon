@@ -6,7 +6,7 @@ After=network-online.target docker.service
 User=linux1
 WorkingDirectory=/home/linux1/secondlook
 EnvironmentFile=/home/linux1/secondlook/.api.env
-ExecStart=/home/linux1/secondlook/.venv/bin/uvicorn src.api.main:app --host 0.0.0.0 --port 8000
+ExecStart=/home/linux1/secondlook/.venv/bin/uvicorn src.api.main:app --host 0.0.0.0 --port 8000 --workers 3
 Restart=always
 RestartSec=3
 

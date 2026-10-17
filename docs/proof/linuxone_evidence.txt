@@ -1,9 +1,9 @@
-== collected 2026-10-17T15:01:45Z on wise-datathon
+== collected 2026-10-17T15:10:13Z on wise-datathon
 == architecture / resources
 Linux wise-datathon 6.8.0-147-generic #147-Ubuntu SMP Thu Sep 24 10:59:43 UTC 2026 s390x s390x s390x GNU/Linux
 3
                total        used        free      shared  buff/cache   available
-Mem:            8009        5413        1561           9        1181        2595
+Mem:            8009        5613        1353          15        1195        2395
 == CPU facilities (note: nnpa listed; SecondLook CPU code does not use it)
 Architecture:                            s390x
 Byte Order:                              Big Endian
@@ -13,24 +13,24 @@ nnpa sie vxe2
 active
 active
 == API health / summary
-{"status":"ok","arch":"s390x","python":"3.12.3","model_load_s":0.153,"version":"secondlook-0.1"}
+{"status":"ok","arch":"s390x","python":"3.12.3","model_load_s":0.147,"version":"secondlook-0.1"}
 {"applications":37491,"denied":2600,"lenders":447,"denied_with_strong_comparator":1338,"review_queue_size":1726,"insufficient_evidence":874,"missing_share":{"income":0.008,"loan_amount":0.0,"dti":0.00
 
 == API benchmark (300 sequential /analyse-application, simulated input)
- "median_ms": 4.519295496720588,
- "p95_ms": 10.738044999015983,
- "throughput_rps": 173.56757980018216,
-  "model_load_s": 0.153,
-  "median_ms": 3.3756449993234128,
-  "p95_ms": 9.20147199503844,
-  "max_rss_mb": 114.5078125,
-  "model_load_s": 0.1533441620049416
+ "median_ms": 3.8842454996483866,
+ "p95_ms": 5.513493000762537,
+ "throughput_rps": 243.42441245494845,
+  "model_load_s": 0.15,
+  "median_ms": 4.146781000599731,
+  "p95_ms": 41.52325404720613,
+  "max_rss_mb": 120.4296875,
+  "model_load_s": 0.14676221500121756
 == full matching on this host (digests equal arm64 results)
 arch s390x rows 37491
-lender: 0.68s pairs=7621 strong_best=1338 digest=3c61072b7f
-lender_msa: 1.22s pairs=7333 strong_best=986 digest=336b6e4fb6
-market: 5.33s pairs=7683 strong_best=2051 digest=ee656dbcf1
-max_rss_mb 812.46875
+lender: 0.66s pairs=7621 strong_best=1338 digest=3c61072b7f
+lender_msa: 1.19s pairs=7333 strong_best=986 digest=336b6e4fb6
+market: 5.05s pairs=7683 strong_best=2051 digest=ee656dbcf1
+max_rss_mb 812.7578125
 == Granite server
 {"model": "granite-4.0-h-350m-base-be.f16.gguf", "load_s": 0.57, "n_ctx": 2048}
 == zDNN / NNPA backend lines from llama.cpp (offload then disabled: measured no speed-up)
@@ -42,5 +42,11 @@ ggml_zdnn_init: NNPA name: zDNN
 ggml_zdnn_init: NNPA_PARMBLKFORMAT_0 = true
 ggml_zdnn_init: NNPA_PARMBLKFORMAT_1 = true
 zDNN : NNPA = 1 | NNPA_PARMBLKFORMAT_0 = 1 | NNPA_PARMBLKFORMAT_1 = 1 | CPU : LLAMAFILE = 1 | OPENMP = 1 | REPACK = 1 | 
+== concurrency (3 uvicorn workers, client on same host)
+clients 1 {'requests': 400, 'rps': 204.4, 'median_ms': 4.1, 'p95_ms': 7.2, 'max_ms': 40.8}
+clients 2 {'requests': 400, 'rps': 285.6, 'median_ms': 5.5, 'p95_ms': 13.7, 'max_ms': 41.1}
+clients 4 {'requests': 400, 'rps': 379.8, 'median_ms': 7.9, 'p95_ms': 25.9, 'max_ms': 66.9}
+clients 8 {'requests': 400, 'rps': 450.4, 'median_ms': 14.4, 'p95_ms': 42.5, 'max_ms': 85.5}
+clients 16 {'requests': 400, 'rps': 473.0, 'median_ms': 30.4, 'p95_ms': 65.6, 'max_ms': 85.8}
 == cached validated Granite notes
 26 cached notes; generators: ['granite-4.0-h-350m-base']

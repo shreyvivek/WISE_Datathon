@@ -78,3 +78,15 @@ Historical decisions are not an approval standard; Model B is for auditing only.
 - Latency (shared 3-vCPU VM): ~13 s for a 44-token note measured in isolation; 17-63 s through the API (shared VM, other work running; one uncached request took 63 s). Not real-time, so notes for the top-25 queue cases are pre-generated and cached; live matching (~4 ms) is the real-time path.
 - zDNN/NNPA: the llama.cpp log shows the zDNN backend initialised on the NNPA device (501 MiB of weights placed on it). Measured effect: with offload on (n_gpu_layers=-1) a 2-shot note took ~18 s vs ~13 s with offload off, and ~13 s vs ~14 s with a 1-shot prompt. **No speed-up was observed for this model, so the server runs with offload off and we make no acceleration claim.** Single shared VM, 2 repetitions each; treat as indicative.
 - A 350M base model is weak at instruction following; it works here only because the prompt is tightly constrained and every output is validated.
+
+## Concurrency / scalability on the VM (`scripts/benchmark_concurrent.py`, /analyse-application SIMULATION, client on the same 3-vCPU host)
+| clients | req/s | median ms | p95 ms |
+|---|---|---|---|
+| 1 | 235 | 4.0 | 5.7 |
+| 2 | 343 | 4.9 | 9.6 |
+| 4 | 438 | 7.9 | 17.7 |
+| 8 | 460 | 14.0 | 41.1 |
+| 16 | 435 | 32.3 | 76.9 |
+Setup: uvicorn with 3 worker processes (systemd), ~118 MB resident per worker. With a single worker the same endpoint plateaued at ~240 req/s regardless of client count (latency grew linearly with clients) - the
+single-process limit - so moving to 3 workers gave ~1.9x peak throughput. The load generator shares the same 3 vCPUs, so these are conservative. (A first 3-worker run with a keep-alive client showed a flat ~50 ms floor that
+disappeared with new connections - a client/TCP delayed-ACK artifact, not server compute.) `/metrics` is now per worker process.

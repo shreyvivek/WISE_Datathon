@@ -12,5 +12,6 @@ echo "== Granite server"; docker exec notebook curl -s localhost:8001/health; ec
 echo "== zDNN / NNPA backend lines from llama.cpp (offload then disabled: measured no speed-up)"; docker exec notebook /opt/venv/bin/python -c "
 from llama_cpp import Llama
 Llama(model_path=\"/home/ibm-user/granite-4.0-h-350m-base-be.f16.gguf\", n_ctx=256, verbose=True)" 2>&1 | grep -iE "ggml_zdnn_init|zDNN model buffer|NNPA" | head -8
+echo "== concurrency (3 uvicorn workers, client on same host)"; cd ~/secondlook && .venv/bin/python scripts/benchmark_concurrent.py http://localhost:8000 400 | python3 -c "import sys,json; [print(\"clients\",k,v) for k,v in json.load(sys.stdin)[\"levels\"].items()]"
 echo "== cached validated Granite notes"; python3 -c "import json;c=json.load(open(\"data/processed/notes_cache.json\"));print(len(c),\"cached notes; generators:\",sorted({v[\"generator\"] for v in c.values()}))"
 '

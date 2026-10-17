@@ -12,7 +12,7 @@ flowchart TD
       M[Constrained financial-twin matching<br/>+ review priority score]
       F[Blind fairness audit<br/>match on finances -> then reveal]
       S[Model Sensitivity Analysis<br/>logreg + XGBoost]
-      API[FastAPI :8000<br/>token-gated demographic endpoints<br/>audit log]
+      API[FastAPI :8000 (3 workers)<br/>token-gated demographic endpoints<br/>audit log]
       subgraph CT["Provided JupyterLab container"]
         G[IBM Granite 4.0-H 350M base<br/>llama.cpp - note server :8001]
       end
