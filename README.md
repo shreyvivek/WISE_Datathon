@@ -1,4 +1,5 @@
 # SecondLook — Same qualifications. Different decisions. Who notices?
+**Team WISE — IBM Z Datathon 2026 Project** (theme: Real-Time AI for Critical Decisions)
 IBM Z Datathon 2026. Advisory audit of historical HMDA decisions: finds denied applications with financially comparable approved ones, queues them for
 human review, and reports demographic patterns only as observed disparities (never proof of discrimination).
 ## Run

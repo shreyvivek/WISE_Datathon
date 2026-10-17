@@ -20,3 +20,6 @@ audit_log.jsonl
 api.log
 .pytest_cache/
 Participant Guidebook*.pdf
+
+# IBM-provided lab notebooks are not our code (rule 4); keep out of the repo
+/*.ipynb
