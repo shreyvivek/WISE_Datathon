@@ -1,0 +1,25 @@
+<section id="honest" data-transition="fade" style="background:#F3F1EA;color:#101828;font-family:'DM Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:3px;color:#1D4ED8">VALIDATION · SYNTHETIC TEST</p>
+<h2 style="font-size:64px;font-weight:600;line-height:1.1;letter-spacing:-1px;color:#101828">An honest test: the lender constraint matters</h2>
+</div>
+<div style="display:flex;gap:48px;align-items:flex-start">
+<div style="width:1180px;display:flex;flex-direction:column;gap:32px;padding:40px 44px;background:#FFFFFF;border:1px solid #D9D5C8;border-radius:24px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#5A6478">PRECISION AT 200 · INJECTED INCONSISTENCIES FOUND</p>
+<div style="display:flex;align-items:center;gap:16px"><p style="width:440px;font-size:32px;color:#101828">Same-lender nearest</p><div style="width:520px;height:58px;border-radius:10px;background:#1E3A8A"></div><p style="font-family:'JetBrains Mono', monospace;font-size:32px;font-weight:600;color:#101828">0.59</p></div>
+<div style="display:flex;align-items:center;gap:16px"><p style="width:440px;font-size:32px;font-weight:600;color:#101828">SecondLook score</p><div style="width:300px;height:58px;border-radius:10px;background:#2F6BFF"></div><p style="font-family:'JetBrains Mono', monospace;font-size:32px;font-weight:600;color:#101828">0.34</p></div>
+<div style="display:flex;align-items:center;gap:16px"><p style="width:440px;font-size:32px;color:#101828">SecondLook, tightest first</p><div style="width:264px;height:58px;border-radius:10px;background:#7FA6FF"></div><p style="font-family:'JetBrains Mono', monospace;font-size:32px;font-weight:600;color:#101828">0.30</p></div>
+<div style="display:flex;align-items:center;gap:16px"><p style="width:440px;font-size:32px;color:#101828">Random order</p><div style="width:79px;height:58px;border-radius:10px;background:#A9ADB8"></div><p style="font-family:'JetBrains Mono', monospace;font-size:32px;font-weight:600;color:#101828">0.09</p></div>
+<div style="display:flex;align-items:center;gap:16px"><p style="width:440px;font-size:32px;color:#B42318">Global nearest (no lender)</p><div style="width:4px;height:58px;border-radius:2px;background:#B42318"></div><p style="font-family:'JetBrains Mono', monospace;font-size:32px;font-weight:600;color:#B42318">0.00 ✗</p></div>
+</div>
+<div style="width:436px;display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;flex-direction:column;gap:6px;padding:20px 26px;background:#FFFFFF;border-left:6px solid #1D4ED8;border-radius:12px"><p style="font-size:32px;font-weight:600;line-height:1.15;color:#101828">Same lender is essential</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;padding:20px 26px;background:#FFFFFF;border-left:6px solid #B7791F;border-radius:12px"><p style="font-size:32px;font-weight:600;line-height:1.15;color:#101828">Plain similarity ranks as well. No accuracy win claimed.</p></div>
+<div style="display:flex;flex-direction:column;gap:6px;padding:20px 26px;background:#FFFFFF;border-left:6px solid #1F7A4D;border-radius:12px"><p style="font-size:32px;font-weight:600;line-height:1.15;color:#101828">We add evidence and workflow</p><p style="font-size:24px;line-height:1.35;color:#4B5565">Tolerances, missing-data handling, reason check, audit trail.</p></div>
+</div>
+</div>
+<p style="font-size:24px;line-height:1.4;color:#4B5565">Not measured: review time and real workload savings. Real wrongful denials have no ground truth in public data.</p>
+<p style="position:absolute;left:128px;bottom:64px;width:1500px;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#5A6478">SYNTHETIC: 200 INJECTED NEAR-COPIES AMONG 2,600 REAL DENIALS · MEAN OF 5 SEEDS</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#5A6478">06 / 16</p>
+<aside>We tested honestly. We injected 200 near-copies of approved applications as fake denials among the 2,600 real ones, over five random seeds, and asked which method ranks them first. A global nearest-neighbour search finds none, so the lender constraint is essential. But a plain same-lender similarity ranking does as well or better than our priority score, so we do not claim an accuracy win. Our value is evidence quality and workflow: tolerances, missing-data handling, the reason check and the audit trail. We did not measure review time, and real wrongful denials have no ground truth.</aside>
+</section>

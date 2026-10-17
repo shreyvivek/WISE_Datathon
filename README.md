@@ -39,4 +39,4 @@ Docs: `docs/`. Status: MVP works locally, Granite notes, Model Sensitivity Analy
 | Mermaid (architecture diagram) | https://mermaid.js.org | MIT |
 All SecondLook code in `src/`, `dashboard/`, `scripts/`, `tests/` was written during the datathon window (first commit 2026-10-17); the IBM loan demo notebook was not reused.
 
-Docs: `docs/architecture.md`, `docs/runbook.md`, `docs/demo_script.md`, `docs/model_evaluation.md`, `docs/dataset_methodology.md`. LinuxONE evidence: `docs/proof/linuxone_evidence.txt`.
+Slides: `docs/slides/SecondLook_Slides.pdf`. Docs: `docs/architecture.md`, `docs/runbook.md`, `docs/demo_script.md`, `docs/model_evaluation.md`, `docs/dataset_methodology.md`. LinuxONE evidence: `docs/proof/linuxone_evidence.txt`.

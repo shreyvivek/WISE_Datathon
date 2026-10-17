@@ -1,0 +1,37 @@
+<section id="model" data-transition="fade" style="background:#0F1628;color:#E8ECF4;font-family:'DM Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:36px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:3px;color:#6FA3FF">APPENDIX · MODEL SENSITIVITY · XGBOOST ON LINUXONE</p>
+<h2 style="font-size:64px;font-weight:600;line-height:1.1;letter-spacing:-1px;color:#F5F7FC">Do the public fields explain the gap? Not fully.</h2>
+</div>
+<div style="display:flex;gap:48px;align-items:flex-start">
+<div style="width:1040px;display:flex;flex-direction:column;gap:20px;padding:30px 40px;background:#121A2E;border:1px solid #25304D;border-radius:24px">
+<div style="display:flex;justify-content:space-between;align-items:center"><p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#9BA7BF">DENIAL RATE (%) · ACTUAL VS MODEL</p></div>
+<div style="display:flex;gap:18px"><p style="font-size:24px;color:#E8ECF4">■ actual</p><p style="font-size:24px;color:#6FA3FF">■ predicted without demographics</p><p style="font-size:24px;color:#B9A4FF">■ with demographics</p></div>
+<div style="display:flex;justify-content:space-around;align-items:flex-end">
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:10px;align-items:flex-end;height:380px">
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#E8ECF4">4.7</p><div style="width:70px;height:116px;border-radius:8px 8px 0 0;background:#E8ECF4"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#6FA3FF">5.3</p><div style="width:70px;height:131px;border-radius:8px 8px 0 0;background:#5B9BFF"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#B9A4FF">4.7</p><div style="width:70px;height:116px;border-radius:8px 8px 0 0;background:#A58BFF"></div></div>
+</div><p style="font-size:32px;font-weight:600;color:#F5F7FC">White</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:10px;align-items:flex-end;height:380px">
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#E8ECF4">13.1</p><div style="width:70px;height:325px;border-radius:8px 8px 0 0;background:#E8ECF4"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#6FA3FF">11.5</p><div style="width:70px;height:285px;border-radius:8px 8px 0 0;background:#5B9BFF"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#B9A4FF">13.1</p><div style="width:70px;height:325px;border-radius:8px 8px 0 0;background:#A58BFF"></div></div>
+</div><p style="font-size:32px;font-weight:600;color:#F5F7FC">Black</p></div>
+<div style="display:flex;flex-direction:column;gap:12px;align-items:center"><div style="display:flex;gap:10px;align-items:flex-end;height:380px">
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#E8ECF4">8.6</p><div style="width:70px;height:214px;border-radius:8px 8px 0 0;background:#E8ECF4"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#6FA3FF">7.7</p><div style="width:70px;height:191px;border-radius:8px 8px 0 0;background:#5B9BFF"></div></div>
+<div style="width:76px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px"><p style="font-size:24px;font-weight:600;color:#B9A4FF">8.4</p><div style="width:70px;height:209px;border-radius:8px 8px 0 0;background:#A58BFF"></div></div>
+</div><p style="font-size:32px;font-weight:600;color:#F5F7FC">Asian</p></div>
+</div>
+</div>
+<div style="width:576px;display:flex;flex-direction:column;gap:20px">
+<div style="display:flex;flex-direction:column;gap:6px;padding:24px 30px;background:#121A2E;border:1px solid #25304D;border-radius:20px"><p style="font-size:56px;font-weight:600;line-height:1.05;color:#F5F7FC">0.867 → 0.873</p><p style="font-size:24px;line-height:1.4;color:#9BA7BF">AUC without vs with demographics. Overall accuracy barely moves.</p></div>
+<p style="font-size:24px;line-height:1.5;color:#C9D3E6">Without demographics the model under-predicts denials for Black applicants (11.5% vs 13.1%). The public finance, lender and county fields do not fully explain group differences.</p>
+<div style="display:flex;flex-direction:column;gap:8px;padding:22px 28px;background:#2B2412;border:1px solid #6B5A1F;border-radius:18px"><p style="font-size:24px;line-height:1.45;color:#E8D9A8">Predicts historical decisions, not correct ones. Not evidence that a lender used race. The with-demographics model is for auditing only.</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1500px;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#8793AD">30,254 APPLICATIONS · 5-FOLD OUT-OF-FOLD · TRAINED ON S390X IN 32 S</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#8793AD">15 / 16</p>
+<aside>An exploratory model sensitivity analysis, trained with XGBoost inside the LinuxONE container. We predict the historical decision from finances, lender and county, with and without demographics. Without them, the model under-predicts denials for Black applicants, 11.5 percent against 13.1 actual; adding demographics closes the gap, while overall accuracy barely changes. So the public fields do not fully explain the differences. But this does not show that a lender used race: credit scores and other inputs are missing, and omitting race does not remove proxies.</aside>
+</section>
