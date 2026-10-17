@@ -3,7 +3,7 @@
   "createdOnFiles": {"v": 1, "at": "2026-10-17T17:00:00Z"},
   "lists": "css",
   "title": "SecondLook — Team WISE",
-  "order": ["cover", "hook", "data", "method", "fairness", "honest", "ibm", "close", "appendix", "gap", "profiles", "case", "triage", "workflow", "model", "context"],
+  "order": ["cover", "hook", "data", "method", "fairness", "honest", "ibm", "close", "appendix", "architecture", "flow", "gap", "profiles", "case", "triage", "workflow", "model", "context"],
   "sections": {
     "s1": {"description": "The 3-minute video flow: problem, data and solution.", "start": "cover"},
     "s2": {"description": "Fairness, IBM LinuxONE, the honest test and the close.", "start": "fairness"},

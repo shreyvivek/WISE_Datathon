@@ -1,0 +1,42 @@
+<section id="architecture" data-transition="fade" style="background:#0A0F1C;color:#E8ECF4;font-family:'DM Sans', Arial, sans-serif;padding:112px 128px 160px;display:flex;flex-direction:column;gap:40px">
+<div style="display:flex;flex-direction:column;gap:12px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:3px;color:#F5C451">APPENDIX · ARCHITECTURE</p>
+<h2 style="font-size:64px;font-weight:600;line-height:1.1;letter-spacing:-1px;color:#F5F7FC">System architecture</h2>
+</div>
+<div style="display:flex;align-items:stretch">
+<div style="width:270px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#9BA7BF">PUBLIC DATA</p>
+<div style="display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:#121A2E;border:1px solid #25304D;border-radius:16px"><p style="font-size:32px;font-weight:600;color:#F5F7FC">HMDA 2025</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">Maryland loan applications</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:#121A2E;border:1px solid #25304D;border-radius:16px"><p style="font-size:32px;font-weight:600;color:#F5F7FC">SHED 2025</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">Fed survey, weighted context</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:#121A2E;border:1px solid #25304D;border-radius:16px"><p style="font-size:32px;font-weight:600;color:#F5F7FC">ACS 2024</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">County income, population</p></div>
+</div>
+<p style="width:56px;align-self:center;text-align:center;font-size:44px;color:#4A5A85">→</p>
+<div style="width:300px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#9BA7BF">PREPARE</p>
+<div style="display:flex;flex-direction:column;gap:14px;padding:22px 24px;background:#121A2E;border:1px solid #25304D;border-radius:16px;flex:1">
+<p style="font-size:32px;font-weight:600;line-height:1.2;color:#F5F7FC">Cohort filter and leak-safe split</p>
+<p style="font-size:24px;line-height:1.3;padding:10px 14px;border-radius:10px;background:#14213F;border:1px solid #5B9BFF">applications: finances only</p>
+<p style="font-size:24px;line-height:1.3;padding:10px 14px;border-radius:10px;background:#2B2412;border:1px solid #6B5A1F">audit_only: demographics</p>
+<p style="font-size:24px;line-height:1.3;padding:10px 14px;border-radius:10px;background:#1B2540;border:1px solid #34436B">denial_context: display only</p>
+</div>
+</div>
+<p style="width:56px;align-self:center;text-align:center;font-size:44px;color:#4A5A85">→</p>
+<div style="width:660px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#6FA3FF">IBM LINUXONE · S390X · 3 VCPU</p>
+<div style="display:flex;flex-direction:column;gap:14px;padding:22px 24px;background:#14213F;border:2px solid #5B9BFF;border-radius:20px;flex:1">
+<div style="display:flex;flex-wrap:wrap;gap:10px"><p style="font-size:24px;font-weight:500;padding:10px 16px;border-radius:12px;background:#0A0F1C;border:1px solid #34436B">Twin matching and priority score</p><p style="font-size:24px;font-weight:500;padding:10px 16px;border-radius:12px;background:#0A0F1C;border:1px solid #34436B">Blind fairness audit</p><p style="font-size:24px;font-weight:500;padding:10px 16px;border-radius:12px;background:#0A0F1C;border:1px solid #34436B">XGBoost sensitivity</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:16px 20px;background:#0A0F1C;border:1px solid #5B9BFF;border-radius:14px"><p style="font-size:32px;font-weight:600;color:#F5F7FC">FastAPI, 3 workers</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">Token-gated demographic endpoints, audit log</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:16px 20px;border:2px dashed #5B9BFF;border-radius:14px"><p style="font-size:24px;letter-spacing:1px;font-family:'JetBrains Mono', monospace;color:#6FA3FF">IBM-PROVIDED CONTAINER</p><p style="font-size:32px;font-weight:600;color:#F5F7FC">Granite 4.0 via llama.cpp</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">Facts in, validated note out</p></div>
+</div>
+</div>
+<div style="width:56px;align-self:center;display:flex;flex-direction:column;align-items:center"><p style="font-size:44px;color:#4A5A85">→</p><p style="font-family:'JetBrains Mono', monospace;font-size:24px;color:#8793AD">SSH</p></div>
+<div style="width:260px;display:flex;flex-direction:column;gap:14px">
+<p style="font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#9BA7BF">REVIEW</p>
+<div style="display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:#121A2E;border:1px solid #25304D;border-radius:16px"><p style="font-size:32px;font-weight:600;line-height:1.15;color:#F5F7FC">Streamlit dashboard</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">8 pages</p></div>
+<div style="display:flex;flex-direction:column;gap:4px;padding:18px 22px;background:#122A2A;border:1px solid #2F7F63;border-radius:16px"><p style="font-size:32px;font-weight:600;line-height:1.15;color:#F5F7FC">Human reviewer</p><p style="font-size:24px;line-height:1.3;color:#9BA7BF">Advisory decisions, audit trail</p></div>
+</div>
+</div>
+<p style="position:absolute;left:128px;bottom:64px;width:1500px;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#8793AD">DEMOGRAPHICS ARE JOINED ONLY AFTER MATCHING · GRANITE SEES STRUCTURED FACTS ONLY</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#8793AD">10 / 18</p>
+<aside>System architecture. Public data goes through a cohort filter that splits it into three tables: finances only for matching, demographics kept separate, and denial reasons for display only. Matching, the blind fairness audit, the XGBoost sensitivity model and the API run on the IBM LinuxONE VM, with Granite served from the IBM-provided container. The API is reached over an SSH tunnel by the Streamlit dashboard, and a human reviewer makes advisory decisions that are written to an audit trail.</aside>
+</section>

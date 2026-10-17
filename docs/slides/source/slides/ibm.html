@@ -42,6 +42,6 @@
 </div>
 <p style="font-size:24px;line-height:1.4;color:#F5C451">Straight talk: not faster than a laptop (0.68 s vs 0.38 s for same-lender matching). zDNN initialises, but offload was no faster, so we claim no acceleration.</p>
 <p style="position:absolute;left:128px;bottom:64px;width:1500px;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:1px;color:#8793AD">3 vCPU / 8 GB VM · CLIENT ON THE SAME HOST · 400 REQUESTS PER LEVEL · SIMULATED INPUT</p>
-<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#8793AD">07 / 16</p>
+<p style="position:absolute;right:128px;bottom:64px;width:300px;text-align:right;font-family:'JetBrains Mono', monospace;font-size:24px;letter-spacing:2px;color:#8793AD">07 / 18</p>
 <aside>Everything runs on IBM LinuxONE: this is an s390x instance with three vCPUs, the API runs as a systemd service next to the IBM-provided container where Granite 4 runs on llama dot cpp, and XGBoost trained inside that container. A live, simulated incoming application is matched against about nineteen hundred approved applications in roughly four milliseconds; throughput rises from 235 to about 460 requests a second with concurrent clients. Results are identical to a laptop, so the audit is reproducible. To be straight: it is not faster than a laptop here, and the zDNN backend gave no speed-up, so we claim none. The point is one controlled platform for a sensitive workflow.</aside>
 </section>
