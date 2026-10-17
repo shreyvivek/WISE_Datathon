@@ -1,0 +1,11 @@
+pandas
+numpy
+scipy
+scikit-learn
+duckdb
+requests
+fastapi
+uvicorn
+streamlit
+plotly
+pytest

@@ -1,0 +1,21 @@
+# secrets
+*.pem
+*.key
+.env
+# data (large, re-downloadable)
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+*.npy
+*.parquet
+*.onnx
+*.gguf
+# python
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+.DS_Store
+audit_log.jsonl
+api.log
+.pytest_cache/
