@@ -56,6 +56,27 @@ Matching, scoring, the fairness audit, XGBoost and Granite run on a LinuxONE Com
 ## Documentation
 [Architecture](docs/architecture.md) · [Dataset and methodology](docs/dataset_methodology.md) · [Evaluation](docs/model_evaluation.md) · [Deployment](docs/deployment.md) · [Slides](docs/slides/SecondLook_Slides.pdf)
 
+## Reviewer dashboard (`ui_demo/`) — step by step
+A single-page app (plain HTML/JS, no build, works offline). It shows **LIVE API** when connected to the backend, **DEMO DATA** otherwise.
+
+**A. Quick look, no backend (bundled demo data)**
+1. `python3 ui_demo/serve.py` — opens http://localhost:8080.
+
+**B. Live data from the LinuxONE VM (what the demo video uses)**
+1. Put `wise_key.pem` in the repo root: `chmod 600 wise_key.pem` (it is git-ignored).
+2. Get the audit token once: `ssh -i wise_key.pem linux1@148.100.109.157 'cat ~/secondlook/.api.env'` (needed only for the Fairness page).
+3. Terminal 1 — tunnel to the VM's API, leave it running:
+   `ssh -i wise_key.pem -N -L 18000:localhost:8000 linux1@148.100.109.157`
+4. Terminal 2 — dashboard, proxying every API call through the tunnel:
+   `python3 ui_demo/serve.py --api http://localhost:18000 --token <AUDIT_TOKEN>`
+5. Open http://localhost:8080/?reset#overview and check the sidebar badge says **LIVE API**.
+   (`?reset` clears locally saved demo decisions and selects case `b81daae6eb`.)
+
+**C. Same machine as the API** (laptop with `data/processed/`, or on the VM): `uvicorn src.api.main:app --port 8000` then open http://localhost:8000/ui.
+
+**Pages:** Overview → Queue (▾ on a row: *View in detail* / *Compare twins*) → Compare (denied vs. any ranked approved comparator, gap bars in tolerance units) → Case detail (stated reasons vs data, Granite note, grounded Q&A, advisory decision + audit trail) → Simulate (live `/analyse-application`) → Fairness (raw vs matched gap, matching-setting dropdown, reviewer consistency, model sensitivity) → System.
+Decisions saved in live mode go to the VM's append-only review log. Demo script: `docs/demo_walkthrough.md`.
+
 ## Data sources
 | Data | Source | Use |
 |---|---|---|

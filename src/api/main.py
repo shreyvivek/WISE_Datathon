@@ -260,3 +260,9 @@ def note(req: NoteReq):
     if out["generator"].startswith("granite"):
         c[req.app_id] = out; tmp = CACHE.with_suffix(f".{os.getpid()}.tmp"); tmp.write_text(json.dumps(c)); tmp.replace(CACHE)  # atomic; several workers
     return {"app_id": req.app_id, "cached": False, **out}
+
+# ---- UI (ui_demo/): served at /ui so one uvicorn process runs API + dashboard ---------------------------
+from fastapi.staticfiles import StaticFiles
+_UI = Path(__file__).resolve().parents[2] / "ui_demo"
+if _UI.exists():
+    app.mount("/ui", StaticFiles(directory=str(_UI), html=True), name="ui")
