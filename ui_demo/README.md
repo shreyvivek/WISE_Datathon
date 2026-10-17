@@ -2,7 +2,7 @@
 
 A single-page app in plain HTML and JavaScript, with bundled fonts and no build step. Pages: Overview, Queue, Compare (denied application against ranked approved comparators), Case detail (stated reasons against the reported data, Granite note, grounded questions, advisory decision with audit trail), Simulate, Fairness (blind, then reveal), and System.
 
-The sidebar badge shows **LIVE API** when the SecondLook API is reachable and **DEMO DATA** otherwise. Demo data uses the measured aggregates from `docs/model_evaluation.md`; individual cases are synthetic, and decisions saved in that mode stay in the browser.
+The sidebar badge shows **LIVE API** when the SecondLook API is reachable and **DEMO DATA** otherwise. Demo data uses the measured aggregates from `docs/model_evaluation.md` (counts, fairness gaps, model sensitivity, throughput). Individual cases and lenders are synthetic, and the review history starts empty: only decisions saved in the browser appear, and they stay in the browser.
 
 ## Run it
 **Sample data, no backend**

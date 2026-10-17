@@ -45,15 +45,12 @@ window.MOCK = (() => {
   queue.sort((a, b) => b.priority - a.priority);
   const lenders = LENDERS.map(l => { const q = queue.filter(x => x.lei === l.lei); const n = 400 + Math.floor(rnd() * 5000); return { lei: l.lei, alias: l.alias, applications: n, denial_rate: +(0.03 + rnd() * 0.09).toFixed(4), denied: q.length, denied_with_comparator: q.filter(x => x.eligible).length }; }).sort((a, b) => b.applications - a.applications);
 
-  const reviewers = ["reviewer-1", "reviewer-2", "reviewer-3"];
-  const reviewLog = [];
-  const dayAgo = h => new Date(Date.now() - h * 3600e3).toISOString();
-  queue.slice(2, 26).forEach((q, i) => { if (rnd() < 0.7) reviewLog.push({ ts: dayAgo(2 + i * 3.3), app_id: q.app_id, decision: pick(["Needs additional information", "Reviewed — no conclusion", "Escalate for further review", "Reviewed — no conclusion"]), reviewer: reviewers[i % 3], comment: "", model_version: "secondlook-0.1", match_quality: q.quality, priority: q.priority, note_generator: "granite-4.0-h-350m" }); });
+  const reviewLog = [];   // sample mode starts with no review history; only decisions saved in the browser appear
 
   const fairness = [
-    { group: "Black", ref: "White", raw_rate_group: 0.131, raw_rate_ref: 0.047, raw_gap_pp: 8.4, raw_ci_lo: 7.6, raw_ci_hi: 9.2, matched_rate_group: 0.078, matched_rate_ref: 0.047, matched_gap_pp: 3.1, matched_ci_lo: 2.0, matched_ci_hi: 4.1, n_group: 6122, n_ref: 19840, n_matched: 4224, coverage: 0.69, small_sample_warning: false },
-    { group: "Asian", ref: "White", raw_rate_group: 0.086, raw_rate_ref: 0.047, raw_gap_pp: 3.9, raw_ci_lo: 3.1, raw_ci_hi: 4.7, matched_rate_group: 0.058, matched_rate_ref: 0.047, matched_gap_pp: 1.1, matched_ci_lo: 0.0, matched_ci_hi: 2.2, n_group: 4292, n_ref: 19840, n_matched: 2532, coverage: 0.59, small_sample_warning: false }];
-  const sensitivity = { // docs/model_evaluation.md, fairness sensitivity table
+    { group: "Black", ref: "White", raw_rate_group: 0.131, raw_rate_ref: 0.047, raw_gap_pp: 8.4, raw_ci_lo: 7.4, raw_ci_hi: 9.3, matched_rate_group: 0.089, matched_rate_ref: 0.058, matched_gap_pp: 3.1, matched_ci_lo: 2.0, matched_ci_hi: 4.1, n_group: 6031, n_ref: 20339, n_matched: 4148, coverage: 0.68778, small_sample_warning: false },
+    { group: "Asian", ref: "White", raw_rate_group: 0.086, raw_rate_ref: 0.047, raw_gap_pp: 3.8, raw_ci_lo: 2.9, raw_ci_hi: 4.7, matched_rate_group: 0.058, matched_rate_ref: 0.047, matched_gap_pp: 1.1, matched_ci_lo: -0.04, matched_ci_hi: 2.3, n_group: 3884, n_ref: 20339, n_matched: 2293, coverage: 0.590371, small_sample_warning: false }];
+  const sensitivity = { // measured: docs/model_evaluation.md, fairness sensitivity table
     base: { label: "same lender · strong · tol ×1", Black: [3.09, 2.1, 4.0, 0.69], Asian: [1.09, 0.0, 2.2, 0.59] },
     moderate: { label: "+ moderate matches", Black: [3.64, 2.8, 4.6, 0.85], Asian: [1.85, 0.8, 2.9, 0.79] },
     tol05: { label: "tolerances ×0.5", Black: [1.74, 0.2, 3.3, 0.30], Asian: [0.43, -1.3, 2.3, 0.24] },
@@ -93,9 +90,6 @@ window.MOCK = (() => {
   function note(id) { if (notes[id]) return notes[id]; const q = queue.find(x => x.app_id === id); const a = apps[id]; const m = FEATS.filter(f => a[f] == null);
     return { note: `${q.n_strong || "No"} strong and ${twins[id].filter(t => t.quality === "moderate").length} moderate approved comparator(s) from the same lender were found (best distance ${q.dist}). Stated reason(s): ${a.denial_reasons.map(c => DENIAL[c]).join(", ")}.${m.length ? " Not reported: " + m.map(f => LBL[f]).join(", ") + "." : ""} Review recommended; this is not a finding about the decision.`, generator: "template-fallback", validation: "n/a", cached: false }; }
   const activity = [];
-  reviewLog.slice(0, 8).forEach(e => activity.push({ ts: e.ts, kind: "decision", text: `${e.reviewer} · ${e.decision}`, app_id: e.app_id }));
-  [1, 3, 5].forEach((i, k) => activity.push({ ts: dayAgo(1 + k * 1.7), kind: "note", text: "Granite note validated", app_id: queue[i].app_id }));
-  [0, 4].forEach((i, k) => activity.push({ ts: dayAgo(0.5 + k), kind: "ask", text: "Question: what could explain the denial?", app_id: queue[i].app_id }));
   activity.sort((a, b) => b.ts < a.ts ? -1 : 1);
 
   return { FEATS, TOL, REL, DENIAL, COUNTIES, LENDERS, QUESTIONS, apps, twins, queue, lenders, reviewLog, fairness, sensitivity, modelSens, evaluation, throughput, summary, reasonReview, answer, note, activity, dist, qual, LBL,

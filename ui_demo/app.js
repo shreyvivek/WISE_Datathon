@@ -78,6 +78,7 @@ V.overview = async () => {
   $("#funnel").innerHTML = `<h3>Funnel</h3><div style="display:flex;gap:18px;align-items:center">${donut([["queued", s.review_queue_size, "#ffb547"], ["insufficient", s.insufficient_evidence, "#7aa2ff"], ["approved", s.applications - s.denied, "#222228"]], 130)}<div class="kv"><b><i style="color:#222228">●</i> approved</b><span>${n0(s.applications - s.denied)}</span><b><i class="c-amber">●</i> queued</b><span>${n0(s.review_queue_size)}</span><b><i class="c-blue">●</i> not enough evidence</b><span>${n0(s.insufficient_evidence)}</span></div></div>`;
   const acts = [...log.slice(0, 6).map(e => ({ ts: e.ts, col: `var(--${statusPill(e.decision)})`, text: `${e.reviewer} · ${e.decision}`, id: e.app_id })), ...A.activity.filter(a => a.kind !== "decision").map(a => ({ ts: a.ts, col: a.kind === "note" ? "var(--blue)" : "var(--teal)", text: a.text, id: a.app_id }))].sort((a, b) => b.ts < a.ts ? -1 : 1).slice(0, 8);
   $("#feed").innerHTML = `<h3>Recent activity</h3><div class="feed">${acts.map(a => `<div class="ev"><span class="dot" style="background:${a.col}"></span><div>${esc(a.text)}<br><a href="#case" class="mono c-mute" data-case="${a.id}">${a.id}</a></div><span class="t">${ago(a.ts)}</span></div>`).join("")}</div>`;
+  if (!acts.length) $("#feed").innerHTML += '<div class="empty">No activity yet.</div>';
   bindCaseLinks();
 };
 
@@ -204,6 +205,7 @@ V.fairness = async () => {
   // reviewer consistency: one square per review, coloured by decision
   const byR = {}; lg.forEach(e => (byR[e.reviewer] = byR[e.reviewer] || []).push(e.decision));
   $("#reviewers").innerHTML = `<h3>Reviewer consistency</h3>${Object.entries(byR).map(([r, ds], i) => { const n = ds.length, cnt = DECISIONS.map(d => ds.filter(x => x === d).length), e = cnt[2]; return `<div class="rv"><div class="who" style="display:flex;align-items:center">${av(r, i)}<div><b>${esc(r)}</b><small>${n} reviews</small></div></div><div class="sb">${DECISIONS.map((d, k) => cnt[k] ? `<i style="width:${100 * cnt[k] / n}%;background:var(--${statusPill(d)})" title="${d}">${Math.round(100 * cnt[k] / n)}%</i>` : "").join("")}</div><div class="esc c-violet">${Math.round(100 * e / n)}%<small>escalated</small></div></div>`; }).join("") || "<div class='c-mute'>No reviews yet.</div>"}<div class="legend">${DECISIONS.map(d => `<span><i style="background:var(--${statusPill(d)})"></i>${d.split(" ")[0] === "Reviewed" ? "No conclusion" : d.split(" ")[0] === "Needs" ? "Needs info" : "Escalate"}</span>`).join("")}</div>`;
+  if (!Object.keys(byR).length) $("#reviewers").innerHTML += '<div class="empty">No reviews recorded yet.</div>';
   // model sensitivity as a slope chart
   const ms = msr.data && (msr.data.models || msr.data); const key = ms && (ms.xgb ? "xgb" : "logreg"); const mm = ms && ms[key];
   const grp = mm && (mm.groups || (mm.by_group && Object.fromEntries(Object.entries(mm.by_group).map(([g, v]) => [gkey(g), [+(100 * v.actual_denial_rate).toFixed(1), +(100 * v.mean_pred_A).toFixed(1), +(100 * v.mean_pred_B).toFixed(1)]]))));
